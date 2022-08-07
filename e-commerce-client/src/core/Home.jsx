@@ -1,0 +1,49 @@
+import React, { useEffect, useState } from "react";
+import Layout from "./Layout";
+import Card from "./components/Card";
+import axios from "axios";
+function Home() {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/products", {
+        params:{
+          arrival: "desc", 
+          limit: 5
+        }
+      })
+      .then((response) => {
+        if (!response.data.error) {
+          setProducts(response.data);
+        } else {
+          setError(response.data.error);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+  return (
+    <>
+      <Layout title="Home Page" description="Node React E-commerce App" className="container-fluid">
+        <h1>Newest arrivals!</h1>
+        <div className="d-flex flex-wrap">
+          {products.map((product, i) => {
+            return (
+              <Card
+                key={i}
+                id={product._id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+              />
+            );
+          })}
+        </div>
+      </Layout>
+    </>
+  );
+}
+
+export default Home;

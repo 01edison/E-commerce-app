@@ -1,0 +1,1 @@
+exports.Url = process.env.REACT_APP_URL
