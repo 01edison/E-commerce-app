@@ -1,18 +1,44 @@
+import moment from "moment";
 import React from "react";
 import { Link } from "react-router-dom";
 import Image from "./Image";
-const Card = ({ id, name, description, price }) => {
+const Card = ({
+  id,
+  name,
+  description,
+  price,
+  category,
+  quantity,
+  showViewProductButton = true,
+  createdAt,
+}) => {
+  const showStock = (quantity) => {
+    return quantity > 0 ? (
+      <span className="badge badge-primary badge-pill mb-2">In Stock</span>
+    ) : (
+      <span className="badge badge-danger badge-pill mb-2">Out of Stock</span>
+    );
+  };
   return (
     <>
       <div className="card product-card mb-3 mx-3">
         <div className="card-header">{name}</div>
         <div className="card-body">
-          <Image id={id} />
-          <p>{description}</p>
-          <p>${price}</p>
-          <Link to={`/product/${id}`} className="btn btn-outline-primary mr-2">
-            View Product
-          </Link>
+          <Image id={id} />{showStock(quantity)}
+          <p className="lead mt-2">{description}</p>
+          <p className="black-9">${price}</p>
+          <p>Category: {category}</p>
+          <p>Added {moment(createdAt).fromNow()}</p>
+          
+          {showViewProductButton && (
+            <Link
+              to={`/product/${id}`}
+              className="btn btn-outline-primary mr-2"
+            >
+              View Product
+            </Link>
+          )}
+
           <Link to="/" className="btn btn-outline-success">
             Add to Cart
           </Link>

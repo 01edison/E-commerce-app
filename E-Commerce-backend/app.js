@@ -185,16 +185,18 @@ app.get("/products", (req, res) => {
     });
 });
 
-app.get("/product/:productId", (req, res) => {  
+app.get("/product/:productId", (req, res) => {
   let productId = req.params.productId;
 
-  Product.findById(productId).exec(function (err, foundProduct) {
-    if (err || !foundProduct) {
-      return res.status(400).json({ error: "Product not found." });
-    }
-    foundProduct.photo = undefined;
-    return res.json({ product: foundProduct });
-  });
+  Product.findById(productId)
+    .populate("category", "_id name")
+    .exec(function (err, foundProduct) {
+      if (err || !foundProduct) {
+        return res.status(400).json({ error: "Product not found." });
+      }
+      foundProduct.photo = undefined;
+      return res.json({ product: foundProduct });
+    });
 });
 
 app.get("/products/related/:productId", (req, res) => {

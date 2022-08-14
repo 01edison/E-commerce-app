@@ -4,7 +4,6 @@ import Card from "./components/Card";
 import axios from "axios";
 function Home() {
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState("");
   useEffect(() => {
     axios
       .get("http://localhost:4000/products", {
@@ -16,8 +15,6 @@ function Home() {
       .then((response) => {
         if (!response.data.error) {
           setProducts(response.data);
-        } else {
-          setError(response.data.error);
         }
       })
       .catch((error) => {
@@ -36,6 +33,9 @@ function Home() {
                 id={product._id}
                 name={product.name}
                 description={product.description}
+                category={product.category.name}
+                createdAt={product.createdAt}
+                quantity={product.quantity}
                 price={product.price}
               />
             );

@@ -68,14 +68,18 @@ const Shop = () => {
         <div className="row">
           <div className="col-lg-4">
             <h3>Filter by Price</h3>
-            <RadioBox setRange={setRange}/>
+            <RadioBox setRange={setRange} />
           </div>
           <div className="col-lg-8 border p-3 rounded">
             {/* <div className="mb-3">
               {!error ?`${size} products found` :``}
             </div> */}
             <div className="d-flex flex-wrap">
-              {error ? <p className="text-center">No products found</p> : <p>{size} products found</p>}
+              {error ? (
+                <p className="text-center">No products found</p>
+              ) : (
+                <p>{size} products found</p>
+              )}
               {products !== [] &&
                 error === false &&
                 products.map((product, index) => {
@@ -85,6 +89,7 @@ const Shop = () => {
                         key={index}
                         id={product._id}
                         name={product.name}
+                        
                         description={product.description}
                         price={product.price}
                       />
