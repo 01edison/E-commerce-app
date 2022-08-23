@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Url } from "../../config";
 import Layout from "../Layout";
 import Card from "./Card";
 import axios from "axios";
@@ -11,13 +12,13 @@ const Product = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/product/${productId}`)
+      .get(`${Url}/product/${productId}`)
       .then((response) => {
         console.log(response.data);
         setProduct(response.data.product);
 
         axios
-          .get(`http://localhost:4000/products/related/${productId}`)
+          .get(`${Url}/products/related/${productId}`)
           .then((response) => {
             console.log(response.data);
             setRelatedProducts(response.data.products);

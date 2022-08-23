@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
 import Card from "./components/Card";
+import { Url } from "../config";
 import axios from "axios";
 function Home() {
   const [products, setProducts] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:4000/products", {
-        params:{
-          arrival: "desc", 
-          limit: 5
-        }
+      .get(`${Url}/products`, {
+        params: {
+          arrival: "desc",
+          limit: 5,
+        },
       })
       .then((response) => {
         if (!response.data.error) {
@@ -23,7 +24,11 @@ function Home() {
   }, []);
   return (
     <>
-      <Layout title="Home Page" description="Node React E-commerce App" className="container-fluid">
+      <Layout
+        title="Home Page"
+        description="Node React E-commerce App"
+        className="container-fluid"
+      >
         <h1>Newest arrivals!</h1>
         <div className="d-flex flex-wrap">
           {products.map((product, i) => {

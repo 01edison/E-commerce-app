@@ -89,7 +89,7 @@ const Shop = () => {
                         key={index}
                         id={product._id}
                         name={product.name}
-                        
+                        quantity={product.quantity}
                         description={product.description}
                         price={product.price}
                       />

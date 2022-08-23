@@ -14,7 +14,7 @@ const RadioBox = ({ setRange }) => {
       {prices.map((price, i) => {
         return (
           <>
-            <div>
+            <div key={i}>
               <input
                 key={i}
                 id={price.id}

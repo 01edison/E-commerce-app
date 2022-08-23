@@ -14,4 +14,3 @@ export const authenticate = (data) => {
     localStorage.setItem("jwt", JSON.stringify(data)); //store the user and token in the local storage
   }
 };
-

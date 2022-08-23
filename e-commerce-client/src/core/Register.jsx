@@ -37,25 +37,25 @@ function Register() {
     axios
       .post(`http://localhost:4000/register`, qs.stringify(body)) //the qs module allows for easy parsing of inputdata using axios
       .then((response) => {
-        console.log(response.data)
+        // console.log(response.data);
         if (!response.data.error) {
           setError(false);
           setSuccess(true);
+          setTimeout(() => {
+            navigate("/login");
+          }, 4000);
         } else {
-          
+          console.log(response.data);
           setError(true);
           setSuccess(false);
         }
         setUser((prevItems) => {
           return { ...prevItems, name: "", email: "", password: "" };
         });
-
-        setTimeout(() => {
-          navigate("/login");
-        }, 4000);
       })
       .catch((error) => {
         //handle any axios errors
+        console.log(error);
         setError(error.response.data.error);
       });
   };

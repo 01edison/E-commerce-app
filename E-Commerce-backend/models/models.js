@@ -1,4 +1,3 @@
-const { stubTrue } = require("lodash");
 const mongoose = require("mongoose");
 const { Schema, model } = require("mongoose");
 
@@ -10,39 +9,6 @@ mongoose.connect(
   () => console.log("DB Connection established")
 );
 
-const userSchema = Schema(
-  {
-    name: String,
-    email: String,
-    password: String,
-    history: {
-      type: Array,
-      default: [],
-    },
-    role: {
-      type: Number,
-      default: 0,
-    },
-  },
-  { timestamps: true }
-);
-
-exports.User = new model("User", userSchema);
-
-const categorySchema = Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      maxlength: 32,
-      unique: true,
-    },
-  },
-  { timestamps: true }
-);
-
-exports.Category = new model("Category", categorySchema);
-
 const { ObjectId } = Schema;
 
 const productSchema = Schema(
@@ -52,7 +18,7 @@ const productSchema = Schema(
       trim: true,
       required: true,
       maxlength: 32,
-      unique: true
+      unique: true,
     },
     description: {
       type: String,
@@ -72,7 +38,7 @@ const productSchema = Schema(
     },
     quantity: {
       type: Number,
-      required: true
+      required: true,
     },
     sold: {
       type: Number,
@@ -93,3 +59,41 @@ const productSchema = Schema(
 productSchema.index({ "$**": "text" }); //set the index to text so you can make powerful queries
 
 exports.Product = new model("Product", productSchema);
+
+const userSchema = Schema(
+  {
+    name: String,
+    email: String,
+    password: String,
+    history: {
+      type: Array,
+      default: [],
+    },
+    role: {
+      type: Number,
+      default: 0,
+    },
+    cart: {
+      type: Array,
+      default: [],
+    },
+  },
+  { timestamps: true }
+);
+
+userSchema.plugin(require("mongoose-beautiful-unique-validation"));
+exports.User = new model("User", userSchema);
+
+const categorySchema = Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      maxlength: 32,
+      unique: true,
+    },
+  },
+  { timestamps: true }
+);
+
+exports.Category = new model("Category", categorySchema);

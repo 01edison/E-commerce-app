@@ -2,16 +2,16 @@ const { User } = require("../models/models");
 const { verify } = require("jsonwebtoken");
 // to ensure use is logged in before accessing the route
 
-exports.userById = function (req, res, next) {
-  const userId = req.params.userId;
-  User.findById(userId).exec(function (err, foundUser) {
-    if (!foundUser) {
-      return res.json({ error: "User not found" });
-    }
-    req.profile = foundUser;
-    next();
-  });
-};
+// exports.userById = function (req, res, next) {
+//   const userId = req.params.userId;
+//   User.findById(userId).exec(function (err, foundUser) {
+//     if (!foundUser) {
+//       return res.json({ error: "User not found" });
+//     }
+//     req.profile = foundUser;
+//     next();
+//   });
+// };
 exports.requireSignIn = (req, res, next) => {
   try {
     const authorization = req.headers.authorization; //check the headers for the authorization property

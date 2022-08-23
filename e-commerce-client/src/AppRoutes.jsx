@@ -5,6 +5,7 @@ import Register from "./core/Register";
 import Home from "./core/Home";
 import Shop from "./core/Shop";
 import UserDashboard from "./core/user/UserDashboard";
+import Cart from "./core/Cart";
 import ProtectedUserRoute from "./core/user/ProtectedUserRoute";
 import ProtectedAdminDashboard from "./core/admin/ProtectedAdminDashboard";
 import ProtectedAdminRoute from "./core/admin/ProtectedAdminRoute";
@@ -37,7 +38,7 @@ function AppRoutes() {
               element={<ProtectedAdminDashboard />}
             />
             <Route
-              path="/category/create"
+              path="category/create"
               exact
               element={
                 <ProtectedAdminRoute>
@@ -46,12 +47,20 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/product/create"
+              path="product/create"
               exact
               element={
                 <ProtectedAdminRoute>
                   <AddProduct />
                 </ProtectedAdminRoute>
+              }
+            />
+            <Route
+              path="user/cart"
+              element={
+                <ProtectedUserRoute>
+                  <Cart />
+                </ProtectedUserRoute>
               }
             />
           </Route>

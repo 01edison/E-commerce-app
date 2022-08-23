@@ -10,14 +10,12 @@ const { body, validationResult } = require("express-validator");
 const { sign } = require("jsonwebtoken");
 const { User, Category, Product } = require("./models/models");
 const {
-  userById,
   requireSignIn,
   isAuthenticatedUser,
   isAdmin,
 } = require("./middlewares/middlewares");
-
 const adminOnly = [requireSignIn, isAdmin];
-const isUser = [requireSignIn, userById, isAuthenticatedUser];
+const isUser = [requireSignIn, isAuthenticatedUser];
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -89,7 +87,7 @@ app.post(
                 if (!err) {
                   return res.json({ messsage: "User created successfully!" });
                 } else {
-                  return res.json({ error: err });
+                  return res.status(400).json({ error: err });
                 }
               });
             }
@@ -100,7 +98,7 @@ app.post(
           }
         });
       } catch (error) {
-        return res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error });
       }
     } else {
       return res.status(400).json({ error: errors.array()[0].msg });
@@ -121,11 +119,11 @@ app.post("/login", (req, res) => {
       if (match) {
         const token = sign({ id: foundUser._id }, process.env.JWT_SECRET);
         res.cookie("token", token, { expiresIn: "2h" });
-        const { name, email, history, role } = foundUser;
+        const {_id,  name, email, history, role, cart } = foundUser;
 
         return res.json({
           token: "Bearer " + token,
-          user: { name, email, history, role },
+          user: { _id, name, email, history, role, cart },
         });
       } else {
         return res.status(400).json({ error: "Password is incorrect" });
@@ -140,6 +138,35 @@ app.get("/user/:userId", isUser, (req, res) => {
   //getting user profile
   return res.json({
     profile: req.profile,
+  });
+});
+
+app.post("/user/cart/:productId", requireSignIn, (req, res) => {
+  const userId = req.profile._id;
+  const productId = req.params.productId;
+  Product.findById(productId).exec((err, foundProduct) => {
+    if (!err) {
+      User.findById(userId).exec((err, foundUser) => {
+        if (!err) {
+          const alreadyInCart = foundUser.cart.some( 
+            (item) => item.name == foundProduct.name
+          );
+          if (!alreadyInCart) {
+            foundUser.cart.push(foundProduct);
+            foundUser.save();
+            return res.json({
+              message: `${foundProduct.name} added to ${foundUser.name}'s cart`,
+            });
+          } else {
+            return res.json({ error: "Product already in cart!" });
+          }
+        } else {
+          return res.json({ error: err });
+        }
+      });
+    } else {
+      return res.json({ error: err });
+    }
   });
 });
 
