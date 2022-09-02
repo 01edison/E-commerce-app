@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Layout from "../Layout";
 import axios from "axios";
 import qs from "qs";
+import { Url } from "../../config";
 import { isAuthenticated } from "../../helperMethods/functions";
 
 const AddCategory = () => {
@@ -29,7 +30,7 @@ const AddCategory = () => {
       category: categoryName,
     };
     axios
-      .post("http://localhost:4000/category/create", qs.stringify(body), {
+      .post(`${Url}/category/create`, qs.stringify(body), {
         headers: {
           Authorization: token,
         },

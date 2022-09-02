@@ -71,9 +71,6 @@ const Shop = () => {
             <RadioBox setRange={setRange} />
           </div>
           <div className="col-lg-8 border p-3 rounded">
-            {/* <div className="mb-3">
-              {!error ?`${size} products found` :``}
-            </div> */}
             <div className="d-flex flex-wrap">
               {error ? (
                 <p className="text-center">No products found</p>
@@ -92,6 +89,7 @@ const Shop = () => {
                         quantity={product.quantity}
                         description={product.description}
                         price={product.price}
+                        showDeleteFromCartButton={false}
                       />
                     </>
                   );

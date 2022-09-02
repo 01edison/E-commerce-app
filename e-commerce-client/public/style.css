@@ -15,12 +15,14 @@
 }
 
 .product-card {
-  width: 25rem;
+  max-width: 22rem;
   box-shadow: 0.2rem 0.2rem 0.1rem #bada55;
 }
 
-.product-img {
-  max-height: 300px;
+.product-image {
+  /* max-height: 300px; */
+  width: 150px;
+
 }
 @-webkit-keyframes Gradient {
   0% {

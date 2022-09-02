@@ -1,11 +1,18 @@
 import React from "react";
+import { Url } from "../../config";
 
-const Image = ({ id }) => {
-  return <>
-    <div >
-        <img src={`http://localhost:4000/product/photo/${id}`} alt="" className="product-img"/>
-    </div>
-  </>;
+const Image = ({ id, className }) => {
+  return (
+    <>
+      <div>
+        <img
+          src={`${Url}/product/photo/${id}`}
+          alt=""
+          className={`${className} m-1`}
+        />
+      </div>
+    </>
+  );
 };
 
 export default Image;

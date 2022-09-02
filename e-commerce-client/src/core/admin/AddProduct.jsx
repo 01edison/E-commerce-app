@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "../Layout";
 import axios from "axios";
 import { isAuthenticated } from "../../helperMethods/functions";
+import { Url } from "../../config";
 
 const AddProduct = () => {
   const {
@@ -13,7 +14,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4000/categories")
+      .get(`${Url}/categories`)
       .then((response) => {
         setCategories(response.data.categories);
       })
@@ -62,7 +63,7 @@ const AddProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(false);
-
+   
     formData.append("name", productName); //append the values with key, value pair
     formData.append("description", description);
     formData.append("quantity", quantity);
@@ -92,7 +93,7 @@ const AddProduct = () => {
         } else {
           setSuccess(false);
           setError(true);
-          setErrorMsg(response.data.error)
+          setErrorMsg(response.data.error);
         }
       })
       .catch((error) => {
@@ -170,6 +171,7 @@ const AddProduct = () => {
               className="form-control"
               id="productPrice"
               name="price"
+              min={0}
               required
               onChange={handleInputChange}
             />
@@ -198,6 +200,7 @@ const AddProduct = () => {
               className="form-control"
               id="productQuantity"
               name="quantity"
+              min={0}
               required
               onChange={handleInputChange}
             />

@@ -38,10 +38,11 @@ function Home() {
                 id={product._id}
                 name={product.name}
                 description={product.description}
-                category={product.category.name}
+                category={product.category?.name}
                 createdAt={product.createdAt}
                 quantity={product.quantity}
                 price={product.price}
+                showDeleteFromCartButton={false}
               />
             );
           })}

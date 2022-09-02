@@ -14,6 +14,7 @@ const {
   isAuthenticatedUser,
   isAdmin,
 } = require("./middlewares/middlewares");
+const { captureRejectionSymbol } = require("events");
 const adminOnly = [requireSignIn, isAdmin];
 const isUser = [requireSignIn, isAuthenticatedUser];
 const app = express();
@@ -119,7 +120,7 @@ app.post("/login", (req, res) => {
       if (match) {
         const token = sign({ id: foundUser._id }, process.env.JWT_SECRET);
         res.cookie("token", token, { expiresIn: "2h" });
-        const {_id,  name, email, history, role, cart } = foundUser;
+        const { _id, name, email, history, role, cart } = foundUser;
 
         return res.json({
           token: "Bearer " + token,
@@ -148,7 +149,7 @@ app.post("/user/cart/:productId", requireSignIn, (req, res) => {
     if (!err) {
       User.findById(userId).exec((err, foundUser) => {
         if (!err) {
-          const alreadyInCart = foundUser.cart.some( 
+          const alreadyInCart = foundUser.cart.some(
             (item) => item.name == foundProduct.name
           );
           if (!alreadyInCart) {
@@ -160,6 +161,54 @@ app.post("/user/cart/:productId", requireSignIn, (req, res) => {
           } else {
             return res.json({ error: "Product already in cart!" });
           }
+        } else {
+          return res.json({ error: err });
+        }
+      });
+    } else {
+      return res.json({ error: err });
+    }
+  });
+});
+
+// not in use yet!
+app.post("/user/cart/", requireSignIn, (req, res) => {
+  console.log(req.body.newCartItem);
+  const userId = req.profile._id;
+  const newCartItems = req.body.newCartItem;
+  User.findById(userId).exec((err, foundUser) => {
+    if (!err) {
+      foundUser.cart = newCartItems; // this is where we update the user's cart
+      foundUser.save();
+      return res.json({ message: `${foundUser.name}'s cart updated!` });
+    } else {
+      return res.json({ error: err });
+    }
+  });
+});
+
+app.delete("/user/cart/:productId", requireSignIn, (req, res) => {
+  const userId = req.profile._id;
+  const productId = req.params.productId;
+
+  Product.findById(productId).exec((err, foundProduct) => {
+    if (!err) {
+      User.findById(userId).exec((err, foundUser) => {
+        if (!err) {
+          for (let i = 0; i < foundUser.cart.length; i++) {
+            const cartItemName = foundUser.cart[i].name;
+            if (foundProduct?.name == cartItemName) {
+              const newCartItems = foundUser.cart.filter(
+                (product) => product.name != foundProduct.name
+              );
+              foundUser.cart = newCartItems;
+              foundUser.save();
+              return res.status(200).json({
+                message: `${foundProduct.name} removed successfully from ${foundUser.name}'s cart`,
+              });
+            }
+          }
+          return res.json({ error: "Product not in cart" });
         } else {
           return res.json({ error: err });
         }

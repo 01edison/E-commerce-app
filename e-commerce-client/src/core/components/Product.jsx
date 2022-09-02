@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Url } from "../../config";
 import Layout from "../Layout";
 import Card from "./Card";
+import RelatedCard from "./RelatedCard";
 import axios from "axios";
 
 const Product = () => {
@@ -47,6 +48,7 @@ const Product = () => {
               createdAt={product.createdAt}
               quantity={product.quantity}
               showViewProductButton={false}
+              showDeleteFromCartButton={false}
             />
           </div>
 
@@ -54,7 +56,7 @@ const Product = () => {
             <h4>Related Products</h4>
             {relatedProducts.map((prod, i) => {
               return (
-                <Card
+                <RelatedCard
                   key={prod._id}
                   id={prod._id}
                   name={prod.name}
@@ -64,6 +66,7 @@ const Product = () => {
                   createdAt={prod.createdAt}
                   quantity={prod.quantity}
                   showViewProductButton={true}
+                  showDeleteFromCartButton={false}
                 />
               );
             })}

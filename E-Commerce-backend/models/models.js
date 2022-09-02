@@ -32,7 +32,7 @@ const productSchema = Schema(
       maxlength: 32,
     },
     category: {
-      type: ObjectId,
+      type: ObjectId, // the id of that category
       ref: "Category", // refers to the Category collection in the database
       required: true,
     },
@@ -52,6 +52,11 @@ const productSchema = Schema(
       required: false,
       type: Boolean,
     },
+    cartCount: {
+      type: Number,
+      required: false,
+      default: 0
+    }
   },
   { timestamps: true }
 );
@@ -81,7 +86,6 @@ const userSchema = Schema(
   { timestamps: true }
 );
 
-userSchema.plugin(require("mongoose-beautiful-unique-validation"));
 exports.User = new model("User", userSchema);
 
 const categorySchema = Schema(
