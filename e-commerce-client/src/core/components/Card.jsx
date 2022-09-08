@@ -1,5 +1,5 @@
 import moment from "moment";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Image from "./Image";
 import {
@@ -17,23 +17,29 @@ const Card = ({
   category,
   quantity,
   showViewProductButton = true,
-  showCheckoutButton = false,
   showAddToCartButton = true,
   showDeleteFromCartButton = true,
   createdAt,
   cartUpdate = false,
   setCheckOutTotal,
+  setQuantityAlert,
 }) => {
+  const [error, setError] = useState(false);
   const handleChange = (e) => {
+    setQuantityAlert(false);
+    setError(false);
     if (isAuthenticated != false) {
       const { name, value } = e.target;
-
+      if (value > quantity) {
+        return setError(true);
+      }
       const cartInLocalStorage = JSON.parse(localStorage.getItem("cart")); // we get the cart from the localStorage
       const productInCart = cartInLocalStorage.find(
         (product) => product.name == name
       ); //find that particular product in the cart
 
-      productInCart.cartCount = value === "" || value === "0" ? 1 : Number(value); //update its count
+      productInCart.cartCount =
+        value === "" || value === "0" ? 1 : Number(value); //update its count
 
       localStorage.setItem("cart", JSON.stringify(cartInLocalStorage)); // then we resave the cart in the local storage so changes dont get cleared
       const updatedCart = JSON.parse(localStorage.getItem("cart"));
@@ -47,13 +53,22 @@ const Card = ({
     }
   };
 
+  const showErrorMsg = () => {
+    if (error) {
+      return (
+        <>
+          <p>Max limit exceeded. Adjust with arrows</p>
+        </>
+      );
+    }
+  };
   return (
     <>
       <div className="card product-card mb-3 mx-3">
         <div className="card-header">{name}</div>
         <div className="card-body d-flex">
           <div>
-            <Image id={id} className={"product-image"}/>
+            <Image id={id} className={"product-image"} />
             {cartUpdate && (
               <>
                 <div className="input-group mt-3">
@@ -76,7 +91,7 @@ const Card = ({
           <div className="ml-2">
             {showStock(quantity)}
             <p className="lead mt-2">{description}</p>
-            <p className="black-9">${price}</p>
+            <p className="black-9">₦{price}</p>
             <p>{category ? `Category: ${category}` : ""}</p>
             <p>Added {moment(createdAt).fromNow()}</p>
 
@@ -98,9 +113,6 @@ const Card = ({
                 Add to Cart
               </button>
             )}
-            {showCheckoutButton && (
-              <button className="btn btn-outline-success mr-2">Checkout</button>
-            )}
             {showDeleteFromCartButton && (
               <button
                 className="btn btn-danger"
@@ -111,6 +123,7 @@ const Card = ({
                 Remove Product
               </button>
             )}
+            <p className="mt-5 badge badge-danger">{showErrorMsg()}</p>
           </div>
         </div>
       </div>

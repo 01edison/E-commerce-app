@@ -14,6 +14,7 @@ import Layout from "./Layout";
 const Cart = () => {
   const [cart, setCart] = useState([]);
   const [checkOutTotal, setCheckOutTotal] = useState(0);
+  const [quantityAlert, setQuantityAlert] = useState(false);
   const cartArr = useRef();
   const { token, user = "" } = isAuthenticated(); //incase you're not logged in
 
@@ -63,6 +64,7 @@ const Cart = () => {
                   showCheckoutButton={true}
                   cartUpdate={true}
                   setCheckOutTotal={setCheckOutTotal}
+                  setQuantityAlert={setQuantityAlert}
                 />
               </>
             );
@@ -85,7 +87,12 @@ const Cart = () => {
           <div className="col-6">
             <h2>Your Cart summary</h2>
 
-            <Checkout cart={cart} checkOutTotal={checkOutTotal} />
+            <Checkout
+              cart={cart}
+              checkOutTotal={checkOutTotal}
+              setQuantityAlert={setQuantityAlert}
+              quantityAlert={quantityAlert}
+            />
           </div>
         </div>
       </Layout>

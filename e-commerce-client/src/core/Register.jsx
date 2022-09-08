@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Layout from "./Layout";
+import { Url } from "../config";
 import axios from "axios";
 import qs from "qs";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +36,7 @@ function Register() {
     };
 
     axios
-      .post(`http://localhost:4000/register`, qs.stringify(body)) //the qs module allows for easy parsing of inputdata using axios
+      .post(`${Url}/register`, qs.stringify(body)) //the qs module allows for easy parsing of inputdata using axios
       .then((response) => {
         // console.log(response.data);
         if (!response.data.error) {
@@ -43,7 +44,7 @@ function Register() {
           setSuccess(true);
           setTimeout(() => {
             navigate("/login");
-          }, 4000);
+          }, 3000);
         } else {
           console.log(response.data);
           setError(true);

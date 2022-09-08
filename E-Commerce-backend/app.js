@@ -6,6 +6,7 @@ const _ = require("lodash");
 const fs = require("fs");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const braintree = require("braintree");
 const { body, validationResult } = require("express-validator");
 const { sign } = require("jsonwebtoken");
 const { User, Category, Product } = require("./models/models");
@@ -181,6 +182,20 @@ app.post("/user/cart/", requireSignIn, (req, res) => {
       foundUser.cart = newCartItems; // this is where we update the user's cart
       foundUser.save();
       return res.json({ message: `${foundUser.name}'s cart updated!` });
+    } else {
+      return res.json({ error: err });
+    }
+  });
+});
+
+app.get("/user/clear-cart/:userId", isUser, (req, res) => {
+  const userId = req.profile._id;
+
+  User.findById(userId).exec((err, foundUser) => {
+    if (!err) {
+      foundUser.cart = [];
+      foundUser.save();
+      return res.json({ message: "Cart cleared after succesful payment!" });
     } else {
       return res.json({ error: err });
     }
@@ -531,6 +546,7 @@ app.delete("/category/:categoryId", adminOnly, (req, res) => {
   });
 });
 ////////////////////////////////////////////////////////////////
+
 app.listen(4000, () => {
   console.log("listening on port 4000");
 });
