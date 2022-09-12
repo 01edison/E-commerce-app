@@ -57,7 +57,9 @@ const Card = ({
     if (error) {
       return (
         <>
-          <p>Max limit exceeded. Adjust with arrows</p>
+          <span className="badge badge-danger">
+            Max limit exceeded. Adjust with arrows
+          </span>
         </>
       );
     }
@@ -65,27 +67,27 @@ const Card = ({
   return (
     <>
       <div className="card product-card mb-3 mx-3">
-        <div className="card-header">{name}</div>
+        <div className="card-header">
+          {name} {showErrorMsg()}
+        </div>
         <div className="card-body d-flex">
           <div>
             <Image id={id} className={"product-image"} />
             {cartUpdate && (
-              <>
-                <div className="input-group mt-3">
-                  <div className="input-group-prepend">
-                    <span className="input-group-text">Quantity</span>
-                  </div>
-                  <input
-                    onChange={handleChange}
-                    type="number"
-                    className="form-control"
-                    placeholder="1"
-                    name={name}
-                    min="1"
-                    max={quantity}
-                  />
+              <div className="input-group mt-3">
+                <div className="input-group-prepend">
+                  <span className="input-group-text">Quantity</span>
                 </div>
-              </>
+                <input
+                  onChange={handleChange}
+                  type="number"
+                  className="form-control"
+                  placeholder="Adjust Quantity"
+                  name={name}
+                  min="1"
+                  max={quantity}
+                />
+              </div>
             )}
           </div>
           <div className="ml-2">
@@ -123,7 +125,6 @@ const Card = ({
                 Remove Product
               </button>
             )}
-            <p className="mt-5 badge badge-danger">{showErrorMsg()}</p>
           </div>
         </div>
       </div>

@@ -6,10 +6,9 @@ const _ = require("lodash");
 const fs = require("fs");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const braintree = require("braintree");
 const { body, validationResult } = require("express-validator");
 const { sign } = require("jsonwebtoken");
-const { User, Category, Product } = require("./models/models");
+const { User, Category, Product, Order } = require("./models/models");
 const {
   requireSignIn,
   isAuthenticatedUser,
@@ -146,30 +145,32 @@ app.get("/user/:userId", isUser, (req, res) => {
 app.post("/user/cart/:productId", requireSignIn, (req, res) => {
   const userId = req.profile._id;
   const productId = req.params.productId;
-  Product.findById(productId).exec((err, foundProduct) => {
-    if (!err) {
-      User.findById(userId).exec((err, foundUser) => {
-        if (!err) {
-          const alreadyInCart = foundUser.cart.some(
-            (item) => item.name == foundProduct.name
-          );
-          if (!alreadyInCart) {
-            foundUser.cart.push(foundProduct);
-            foundUser.save();
-            return res.json({
-              message: `${foundProduct.name} added to ${foundUser.name}'s cart`,
-            });
+  Product.findById(productId)
+    .select("-photo")
+    .exec((err, foundProduct) => {
+      if (!err) {
+        User.findById(userId).exec((err, foundUser) => {
+          if (!err) {
+            const alreadyInCart = foundUser.cart.some(
+              (item) => item.name == foundProduct.name
+            );
+            if (!alreadyInCart) {
+              foundUser.cart.push(foundProduct);
+              foundUser.save();
+              return res.json({
+                message: `${foundProduct.name} added to ${foundUser.name}'s cart`,
+              });
+            } else {
+              return res.json({ error: "Product already in cart!" });
+            }
           } else {
-            return res.json({ error: "Product already in cart!" });
+            return res.json({ error: err });
           }
-        } else {
-          return res.json({ error: err });
-        }
-      });
-    } else {
-      return res.json({ error: err });
-    }
-  });
+        });
+      } else {
+        return res.json({ error: err });
+      }
+    });
 });
 
 // not in use yet!
@@ -191,15 +192,19 @@ app.post("/user/cart/", requireSignIn, (req, res) => {
 app.get("/user/clear-cart/:userId", isUser, (req, res) => {
   const userId = req.profile._id;
 
-  User.findById(userId).exec((err, foundUser) => {
-    if (!err) {
-      foundUser.cart = [];
-      foundUser.save();
-      return res.json({ message: "Cart cleared after succesful payment!" });
-    } else {
-      return res.json({ error: err });
+  User.findByIdAndUpdate(
+    userId,
+    { $set: { cart: [] } },
+    { new: true },
+    (err, response) => {
+      if (!err) {
+        console.log(response);
+        return res.json({ message: "Cart cleared after succesful payment!" });
+      } else {
+        return res.json({ error: err });
+      }
     }
-  });
+  );
 });
 
 app.delete("/user/cart/:productId", requireSignIn, (req, res) => {
@@ -544,6 +549,93 @@ app.delete("/category/:categoryId", adminOnly, (req, res) => {
 
     res.json({ message: "Deleted category successfully." });
   });
+});
+
+// Order route
+app.get("/order/list", adminOnly, (req, res) => {
+  Order.find()
+    .populate("user", "_id name email address")
+    .sort({
+      createdAt: "desc",
+    })
+    .exec((err, foundOrders) => {
+      if (!err) {
+        // console.log(foundOrders)
+        return res.json({ orders: foundOrders });
+      } else {
+        return res.status(400).json({ error: err });
+      }
+    });
+});
+
+app.get("/order/status-values", adminOnly, (req, res) => {
+  res.json(Order.schema.path("status").enumValues);
+});
+
+app.post("/order/create/:userId", isUser, (req, res) => {
+  const userId = req.profile._id;
+  const { order, amount, address, reference } = req.body;
+  User.findById(userId).exec((err, foundUser) => {
+    if (!err) {
+      const userEmail = foundUser.email;
+      order.forEach((item) => {
+        foundUser.history.push(item);
+        //update the quantity of product left
+        Product.findOneAndUpdate(
+          { name: item.name },
+          { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+          { new: true },
+          (err, response) => {
+            if (!err) {
+              console.log(response);
+            } else {
+              console.log(err);
+            }
+          }
+        );
+      });
+      foundUser.save();
+      // then create the order
+      Order.create(
+        {
+          products: order,
+          amount,
+          email: userEmail,
+          address,
+          reference,
+          user: userId,
+        },
+        (err, result) => {
+          if (!err) {
+            return res
+              .status(201)
+              .json({ message: "Order created successfully!" });
+          } else {
+            return res.status(500).json({ error: err });
+          }
+        }
+      );
+    } else {
+      return res.json({ error: err });
+    }
+  });
+});
+
+app.put("/order/:orderId", adminOnly, (req, res) => {
+  const orderId = req.params.orderId;
+  const newStatus = req.body.orderStatus;
+  Order.findByIdAndUpdate(
+    orderId,
+    { status: newStatus },
+    { new: true },
+    (err, result) => {
+      if (!err) {
+        return res.json({ message: `Order status updated to ${newStatus}` });
+      } else {
+        return res.json({ error: err });
+      }
+    }
+  );
 });
 ////////////////////////////////////////////////////////////////
 

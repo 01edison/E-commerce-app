@@ -6,9 +6,11 @@ import Home from "./core/Home";
 import Shop from "./core/Shop";
 import UserDashboard from "./core/user/UserDashboard";
 import Cart from "./core/Cart";
+import Profile from "./core/Profile";
 import ProtectedUserRoute from "./core/user/ProtectedUserRoute";
 import ProtectedAdminDashboard from "./core/admin/ProtectedAdminDashboard";
 import ProtectedAdminRoute from "./core/admin/ProtectedAdminRoute";
+import Orders from "./core/admin/Orders";
 import AddCategory from "./core/admin/AddCategory";
 import AddProduct from "./core/admin/AddProduct";
 import Product from "./core/components/Product";
@@ -56,10 +58,27 @@ function AppRoutes() {
               }
             />
             <Route
+              path="view/orders"
+              exact
+              element={
+                <ProtectedAdminRoute>
+                  <Orders />
+                </ProtectedAdminRoute>
+              }
+            />
+            <Route
               path="user/cart"
               element={
                 <ProtectedUserRoute>
                   <Cart />
+                </ProtectedUserRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedUserRoute>
+                  <Profile />
                 </ProtectedUserRoute>
               }
             />

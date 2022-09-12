@@ -55,8 +55,8 @@ const productSchema = Schema(
     cartCount: {
       type: Number,
       required: false,
-      default: 0
-    }
+      default: 0,
+    },
   },
   { timestamps: true }
 );
@@ -101,3 +101,33 @@ const categorySchema = Schema(
 );
 
 exports.Category = new model("Category", categorySchema);
+
+const orderSchema = Schema(
+  {
+    products: {
+      type: Array,
+    },
+    reference: Object,
+    amount: String,
+    address: String,
+    status: {
+      type: String,
+      default: "Not Processed",
+      enum: [
+        "Not Processed",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+      ],
+    },
+    user: {
+      type: ObjectId,
+      ref: "User",
+    },
+    email: String,
+  },
+  { timestamps: true }
+);
+
+exports.Order = new model("Order", orderSchema);

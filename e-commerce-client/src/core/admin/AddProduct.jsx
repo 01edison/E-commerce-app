@@ -77,7 +77,7 @@ const AddProduct = () => {
     };
 
     axios
-      .post("http://localhost:4000/product/create", formData, config)
+      .post(`${Url}/product/create`, formData, config)
       .then((response) => {
         console.log(response);
         if (!response.data.error) {

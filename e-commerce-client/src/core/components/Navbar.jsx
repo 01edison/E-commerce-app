@@ -6,22 +6,6 @@ import { isAuthenticated } from "../../helperMethods/functions";
 
 function Navbar() {
   const [numCartItems, setNumCartItems] = useState(0);
-
-  // if (isAuthenticated() !== false) {
-  //   // get user details from local storage
-
-  //   setInterval(async () => {
-  //     try {
-  //       const res = await axios.get(`${Url}/user/${_id}`, {
-  //         headers: {
-  //           Authorization: token,
-  //         },
-  //       });
-  //       // get the number of cart items directly from the database
-  //     } catch (error) {}
-  //   }, 1000);
-  // }
-
   const { user = "", token } = isAuthenticated(); // default value of user will be empty string unless the user is actually logged in 
   useEffect(() => {
     axios
@@ -36,8 +20,7 @@ function Navbar() {
       .catch((e) => {
         console.log(e);
       });
-  }, []);
-
+  });
   const navigate = useNavigate();
   return (
     <>

@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Url } from "../config";
-import { isAuthenticated } from "../helperMethods/functions";
+import {
+  isAuthenticated,
+  clearCartAfterPayment,
+  createOrder,
+} from "../helperMethods/functions";
 import { usePaystackPayment } from "react-paystack";
 
 export default function Checkout({
@@ -11,6 +15,7 @@ export default function Checkout({
   setQuantityAlert,
 }) {
   const [success, setSuccess] = useState(false);
+  const [address, setAddress] = useState("");
 
   const { user, token } = isAuthenticated();
   const config = {
@@ -20,23 +25,36 @@ export default function Checkout({
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
   };
 
+  const handleAddress = (e) => {
+    setAddress(e.target.value);
+  };
+
   const onSuccess = (reference) => {
     setSuccess(true);
     // Implementation for whatever you want to do with reference and after success call.
     console.log(reference);
+    const cartAtPurchase = JSON.parse(localStorage.getItem("cart"));
+    const body = {
+      order: [],
+      amount: `₦${checkOutTotal}`,
+      address,
+      reference,
+    };
+    cartAtPurchase.forEach((item) => {
+      const orderedItem = {
+        name: item.name,
+        price: item.price,
+        decription: item.description,
+        category: item.category,
+        quantity: item.cartCount,
+      };
+      body.order.push(orderedItem);
+    });
+    // console.log(body);
     localStorage.removeItem("cart");
-    axios
-      .get(`${Url}/user/clear-cart/${user._id}`, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    createOrder(user._id, token, body);
+    clearCartAfterPayment(user._id, token);
+    alert("Cart Cleared!");
   };
 
   // you can call this function anything
@@ -53,7 +71,7 @@ export default function Checkout({
           className="alert alert-info"
           style={{ display: success ? "" : "none" }}
         >
-          Hurray! Payment successful
+          Payment successful. Your order is being processed!
         </div>
       );
     }
@@ -74,6 +92,12 @@ export default function Checkout({
   return (
     <>
       {showSuccess()}
+      <textarea
+        className="mb-3"
+        cols={50}
+        placeholder="Enter your address.."
+        onChange={handleAddress}
+      />
       <h2>
         Total: ₦{checkOutTotal} <sup>{showQuantityAlert()}</sup>
       </h2>

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import Layout from "./Layout";
 import Card from "./components/Card";
+import { Url } from "../config";
 import RadioBox from "./components/RadioBox";
 import axios from "axios";
 
@@ -24,7 +25,7 @@ const Shop = () => {
 
     axios({
       method: "post",
-      url: "http://localhost:4000/products/search",
+      url: `${Url}/products/search`,
       params: {
         q: query.current,
         min: rangeArr !== undefined ? parseInt(rangeArr[0]) : "",

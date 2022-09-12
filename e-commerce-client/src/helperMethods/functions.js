@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from "qs";
 import { Url } from "../config.js";
 
 export const isAuthenticated = () => {
@@ -33,7 +34,7 @@ export const showStock = (quantity) => {
 };
 
 export const addToCart = async (id) => {
-  if (isAuthenticated() != false) {
+  if (isAuthenticated() !== false) {
     const { token } = isAuthenticated();
     const productId = id;
     try {
@@ -50,7 +51,7 @@ export const addToCart = async (id) => {
 };
 
 export const deleteFromCart = async (id) => {
-  if (isAuthenticated() != false) {
+  if (isAuthenticated() !== false) {
     const { token } = isAuthenticated();
     const productId = id;
 
@@ -67,5 +68,35 @@ export const deleteFromCart = async (id) => {
     } catch (error) {
       console.log(error);
     }
+  }
+};
+
+export const clearCartAfterPayment = async (id, token) => {
+  try {
+    const res = await axios.get(`${Url}/user/clear-cart/${id}`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    console.log(res);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const createOrder = async (id, token, data) => {
+  try {
+    const res = await axios.post(
+      `${Url}/order/create/${id}`,
+      qs.stringify(data),
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+    console.log(res);
+  } catch (e) {
+    console.log(e);
   }
 };

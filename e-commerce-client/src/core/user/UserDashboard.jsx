@@ -1,13 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../Layout";
+import axios from "axios";
+import { Url } from "../../config";
 import { isAuthenticated } from "../../helperMethods/functions";
 
 const UserDashboard = () => {
-  const {
-    user: { name, email, role, history },
-  } = isAuthenticated();
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    email: "",
+    role: "",
+    history: [],
+  });
 
+  const { name, email, role, history } = userInfo;
+
+  const getUserInfo = async () => {
+    if (isAuthenticated() != false) {
+      const { token, user } = isAuthenticated();
+      try {
+        const res = await axios.get(`${Url}/user/${user._id}`, {
+          headers: {
+            Authorization: token,
+          },
+        });
+        const { name, email, history, role } = res.data.profile;
+
+        setUserInfo({ ...userInfo, name, email, role, history });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  };
   const userLinks = () => {
     return (
       <>
@@ -21,7 +45,7 @@ const UserDashboard = () => {
                 </Link>
               </li>
               <li className="list-group-item">
-                <Link className="nav-link" to="/profile/update">
+                <Link className="nav-link" to="/profile">
                   Update Profile
                 </Link>
               </li>
@@ -32,6 +56,9 @@ const UserDashboard = () => {
     );
   };
 
+  useEffect(() => {
+    getUserInfo();
+  }, [userInfo]);
   return (
     <>
       <Layout
@@ -54,7 +81,11 @@ const UserDashboard = () => {
             <div className="card mb-3">
               <h3 className="card-header">Purchase History</h3>
               <ul className="list-group">
-                <li className="list-group-item">History: {history}</li>
+                <li className="list-group-item">
+                  {history.map((item) => {
+                    return <p>{item.name}</p>
+                  })}
+                </li>
               </ul>
             </div>
           </div>
