@@ -52,11 +52,6 @@ const productSchema = Schema(
       required: false,
       type: Boolean,
     },
-    cartCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
   },
   { timestamps: true }
 );
@@ -64,6 +59,29 @@ const productSchema = Schema(
 productSchema.index({ "$**": "text" }); //set the index to text so you can make powerful queries
 
 exports.Product = new model("Product", productSchema);
+const cartSchema = Schema({
+  id: {
+    type: ObjectId,
+    ref: "Product",
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  dbQuantity:{
+    type: Number,
+    required: true
+  }
+});
 
 const userSchema = Schema(
   {
@@ -79,7 +97,7 @@ const userSchema = Schema(
       default: 0,
     },
     cart: {
-      type: Array,
+      type: [cartSchema],
       default: [],
     },
   },

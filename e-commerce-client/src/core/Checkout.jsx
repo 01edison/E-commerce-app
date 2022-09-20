@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Url } from "../config";
+import { useCart } from "react-use-cart";
 import {
   isAuthenticated,
-  clearCartAfterPayment,
+  clearCart,
   createOrder,
 } from "../helperMethods/functions";
 import { usePaystackPayment } from "react-paystack";
 
 export default function Checkout({
   cart,
-  checkOutTotal,
   quantityAlert,
   setQuantityAlert,
 }) {
   const [success, setSuccess] = useState(false);
   const [address, setAddress] = useState("");
+  const { emptyCart, cartTotal, items } = useCart();
 
   const { user, token } = isAuthenticated();
   const config = {
     reference: new Date().getTime().toString(),
     email: user.email,
-    amount: checkOutTotal * 100,
+    amount: cartTotal * 100,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
   };
 
@@ -33,28 +32,29 @@ export default function Checkout({
     setSuccess(true);
     // Implementation for whatever you want to do with reference and after success call.
     console.log(reference);
-    const cartAtPurchase = JSON.parse(localStorage.getItem("cart"));
+
+    //USE THE CART STATE FROM THE react-use-cart package
     const body = {
       order: [],
-      amount: `₦${checkOutTotal}`,
+      amount: `₦${cartTotal}`,
       address,
       reference,
     };
-    cartAtPurchase.forEach((item) => {
+    console.log(items);
+    items.forEach((item) => {
       const orderedItem = {
         name: item.name,
         price: item.price,
         decription: item.description,
         category: item.category,
-        quantity: item.cartCount,
+        quantity: item.quantity,
       };
       body.order.push(orderedItem);
     });
     // console.log(body);
-    localStorage.removeItem("cart");
+    clearCart(user._id, token);
     createOrder(user._id, token, body);
-    clearCartAfterPayment(user._id, token);
-    alert("Cart Cleared!");
+    emptyCart();
   };
 
   // you can call this function anything
@@ -99,13 +99,14 @@ export default function Checkout({
         onChange={handleAddress}
       />
       <h2>
-        Total: ₦{checkOutTotal} <sup>{showQuantityAlert()}</sup>
+        Total: ₦{cartTotal} <sup>{showQuantityAlert()}</sup>
       </h2>
 
       <button
         className="btn btn-success btn-block"
         onClick={() => {
           initializePayment(onSuccess, onClose);
+          
         }}
       >
         Checkout

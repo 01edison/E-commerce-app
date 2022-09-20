@@ -57,7 +57,7 @@ const AdminDashboard = () => {
             <div className="card mb-3">
               <h3 className="card-header">Purchase History</h3>
               <ul className="list-group">
-                <li className="list-group-item">History: {history}</li>
+                <li className="list-group-item">History: {}</li>
               </ul>
             </div>
           </div>

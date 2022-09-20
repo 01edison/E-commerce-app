@@ -1,37 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../Layout";
+import {
+  isAuthenticated,
+  purchaseHistory,
+} from "../../helperMethods/functions";
 import axios from "axios";
 import { Url } from "../../config";
-import { isAuthenticated } from "../../helperMethods/functions";
+import { getUserInfo } from "../../helperMethods/functions";
 
 const UserDashboard = () => {
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
     role: "",
-    history: [],
   });
+  const history = useRef();
+  const { name, email, role } = userInfo;
+  const getPurchaseHistory = () => {
+    const { token, user } = isAuthenticated();
 
-  const { name, email, role, history } = userInfo;
-
-  const getUserInfo = async () => {
-    if (isAuthenticated() != false) {
-      const { token, user } = isAuthenticated();
-      try {
-        const res = await axios.get(`${Url}/user/${user._id}`, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        const { name, email, history, role } = res.data.profile;
-
-        setUserInfo({ ...userInfo, name, email, role, history });
-      } catch (e) {
+    axios
+      .get(`${Url}/order/history/${user._id}`, {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        history.current = response.data.foundOrders;
+      })
+      .catch((e) => {
         console.log(e);
-      }
-    }
+      });
   };
+
   const userLinks = () => {
     return (
       <>
@@ -45,7 +48,7 @@ const UserDashboard = () => {
                 </Link>
               </li>
               <li className="list-group-item">
-                <Link className="nav-link" to="/profile">
+                <Link className="nav-link" to="/profile/update">
                   Update Profile
                 </Link>
               </li>
@@ -57,8 +60,12 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    getUserInfo();
-  }, [userInfo]);
+    getUserInfo(userInfo, setUserInfo);
+  }, [history]);
+
+  useEffect(() => {
+    getPurchaseHistory();
+  });
   return (
     <>
       <Layout
@@ -78,16 +85,7 @@ const UserDashboard = () => {
                 </li>
               </ul>
             </div>
-            <div className="card mb-3">
-              <h3 className="card-header">Purchase History</h3>
-              <ul className="list-group">
-                <li className="list-group-item">
-                  {history.map((item) => {
-                    return <p>{item.name}</p>
-                  })}
-                </li>
-              </ul>
-            </div>
+            {}
           </div>
           {userLinks()}
         </div>

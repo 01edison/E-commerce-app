@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-
-import {
-  isAuthenticated,
-  setCartInLocalStorage,
-} from "../helperMethods/functions";
+import { useCart } from "react-use-cart";
+import { isAuthenticated, clearCart } from "../helperMethods/functions";
 import axios from "axios";
 import { Url } from "../config";
 import { Link } from "react-router-dom";
@@ -11,14 +8,14 @@ import Card from "./components/Card";
 import Checkout from "./Checkout";
 import Layout from "./Layout";
 
-const Cart = () => {
-  const [cart, setCart] = useState([]);
-  const [checkOutTotal, setCheckOutTotal] = useState(0);
-  const [quantityAlert, setQuantityAlert] = useState(false);
-  const cartArr = useRef();
-  const { token, user = "" } = isAuthenticated(); //incase you're not logged in
+const Cart = ({ setCheckOutTotal }) => {
+  const { items, setItems, cartTotal, emptyCart } = useCart();
 
-  useEffect(() => {
+  const [quantityAlert, setQuantityAlert] = useState(false);
+
+  const { token, user = "" } = isAuthenticated(); //incase you're not logged in
+  console.log(items);
+  const getCartItems = () => {
     axios
       .get(`${Url}/user/${user._id ? user._id : ""}`, {
         headers: {
@@ -26,13 +23,15 @@ const Cart = () => {
         },
       })
       .then((response) => {
-        cartArr.current = response.data.profile.cart;
-        setCart(response.data?.profile.cart);
-        localStorage.setItem("cart", JSON.stringify(cartArr.current));
+        setItems(response.data.profile.cart);
+        console.log(items);
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+  useEffect(() => {
+    getCartItems();
   }, []);
 
   const noItemsMessage = () => {
@@ -42,22 +41,40 @@ const Cart = () => {
       </h2>
     );
   };
+  const emptyCartItems = () => {
+    if (items.length > 0) {
+      return (
+        <button
+          className="btn btn-danger"
+          onClick={() => {
+            emptyCart();
+            clearCart();
+          }}
+        >
+          Empty Cart!
+        </button>
+      );
+    }
+  };
   const showCartItems = () => {
     return (
       <>
-        <h2>Your cart has {cart.length} items</h2>
+        {emptyCartItems()}
+        <h2>
+          Your cart has {items.length} {items.length > 1 ? "items" : "item"}
+        </h2>
 
         <div className="d-flex flex-wrap">
-          {cart.map((product, i) => {
+          {items.map((product, i) => {
             return (
               <>
                 <Card
                   key={i}
-                  id={product._id}
+                  id={product.id}
                   name={product.name}
                   description={product.description}
                   price={product.price}
-                  quantity={product.quantity}
+                  quantity={product.dbQuantity}
                   createdAt={product.createdAt}
                   showAddToCartButton={false}
                   showDeleteFromCartButton={true}
@@ -77,19 +94,18 @@ const Cart = () => {
     <>
       <Layout
         title="Your cart"
-        description="Checkout items added to cart!"
+        description={`Check out items in your cart, ${user?.name}!`}
         className="container-fluid"
       >
         <div className="row">
           <div className="col-6">
-            {cart.length > 0 ? showCartItems() : noItemsMessage()}
+            {items.length > 0 ? showCartItems() : noItemsMessage()}
           </div>
           <div className="col-6">
             <h2>Your Cart summary</h2>
 
             <Checkout
-              cart={cart}
-              checkOutTotal={checkOutTotal}
+              cart={items}
               setQuantityAlert={setQuantityAlert}
               quantityAlert={quantityAlert}
             />

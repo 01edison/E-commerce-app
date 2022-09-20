@@ -10,7 +10,7 @@ function Home() {
       .get(`${Url}/products`, {
         params: {
           arrival: "desc",
-          limit: 5,
+          limit: 4,
         },
       })
       .then((response) => {

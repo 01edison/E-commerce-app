@@ -19,12 +19,6 @@ export const authenticate = (data) => {
   }
 };
 
-export const setCartInLocalStorage = (cart) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("cart", cart);
-  }
-};
-
 export const showStock = (quantity) => {
   return quantity > 0 ? (
     <span className="badge badge-primary badge-pill mb-2">In Stock</span>
@@ -33,7 +27,7 @@ export const showStock = (quantity) => {
   );
 };
 
-export const addToCart = async (id) => {
+export const addToCartInDB = async (id) => {
   if (isAuthenticated() !== false) {
     const { token } = isAuthenticated();
     const productId = id;
@@ -63,15 +57,13 @@ export const deleteFromCart = async (id) => {
           Authorization: token,
         },
       });
-
-      alert(res.data.message || res.data.error);
     } catch (error) {
       console.log(error);
     }
   }
 };
 
-export const clearCartAfterPayment = async (id, token) => {
+export const clearCart = async (id, token) => {
   try {
     const res = await axios.get(`${Url}/user/clear-cart/${id}`, {
       headers: {
@@ -99,4 +91,54 @@ export const createOrder = async (id, token, data) => {
   } catch (e) {
     console.log(e);
   }
+};
+
+export const getUserInfo = async (userInfo, setUserInfo) => {
+  if (isAuthenticated() != false) {
+    const { token, user } = isAuthenticated();
+    try {
+      const res = await axios.get(`${Url}/user/${user._id}`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      const { name, email, history, role } = res.data.profile;
+
+      setUserInfo({ ...userInfo, name, email, role, history });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
+
+export const purchaseHistory = (history) => {
+  console.log(history)
+
+  // return (
+  //   <>
+  //     <div className="card mb-5">
+  //       <h3 className="card-header">Purchase history</h3>
+  //       <ul className="list-group">
+  //         <li className="list-group-item">
+  //           {history.map((h, i) => {
+  //             return (
+  //               <div key={i}>
+  //                 <hr />
+  //                 {h.products.map((p, i) => {
+  //                   return (
+  //                     <div key={i}>
+  //                       <h6>Product name: {p.name}</h6>
+  //                       <h6>Product price: ${p.price}</h6>
+  //                     </div>
+  //                   );
+  //                 })}
+  //                 <h6>Purchased date: {moment(h.createdAt).fromNow()}</h6>
+  //               </div>
+  //             );
+  //           })}
+  //         </li>
+  //       </ul>
+  //     </div>
+  //   </>
+  // );
 };

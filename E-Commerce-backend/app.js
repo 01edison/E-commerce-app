@@ -149,16 +149,23 @@ app.post("/user/cart/:productId", requireSignIn, (req, res) => {
     .select("-photo")
     .exec((err, foundProduct) => {
       if (!err) {
+        const cartItem = {
+          id: productId,
+          name: foundProduct.name,
+          description: foundProduct.description,
+          price: foundProduct.price,
+          dbQuantity: foundProduct.quantity
+        }
         User.findById(userId).exec((err, foundUser) => {
           if (!err) {
             const alreadyInCart = foundUser.cart.some(
-              (item) => item.name == foundProduct.name
+              (item) => item.name == cartItem.name
             );
             if (!alreadyInCart) {
-              foundUser.cart.push(foundProduct);
+              foundUser.cart.push(cartItem);
               foundUser.save();
               return res.json({
-                message: `${foundProduct.name} added to ${foundUser.name}'s cart`,
+                message: `${cartItem.name} added to ${foundUser.name}'s cart`,
               });
             } else {
               return res.json({ error: "Product already in cart!" });
@@ -241,14 +248,16 @@ app.delete("/user/cart/:productId", requireSignIn, (req, res) => {
 
 app.put("/user/:userId", isUser, (req, res) => {
   //updating user profile
-
   const userId = req.params.userId;
   User.findById(userId).exec(function (err, foundUser) {
     if (err) {
       return res.json({ error: "Error updating user" });
     }
 
-    const updatedUser = _.extend(foundUser, req.body); // extends the values of fields into the foundProduct object
+    if (req.body.password !== undefined) {
+      req.body.password = bcrypt.hashSync(req.body.password, 10); //a new hashed
+    }
+    const updatedUser = _.extend(foundUser, req.body); // extends the values of fields into the foundUser object
 
     updatedUser.save(function (err) {
       if (err) {
@@ -579,7 +588,7 @@ app.post("/order/create/:userId", isUser, (req, res) => {
     if (!err) {
       const userEmail = foundUser.email;
       order.forEach((item) => {
-        foundUser.history.push(item);
+        // foundUser.history.push(item);
         //update the quantity of product left
         Product.findOneAndUpdate(
           { name: item.name },
@@ -587,14 +596,13 @@ app.post("/order/create/:userId", isUser, (req, res) => {
           { new: true },
           (err, response) => {
             if (!err) {
-              console.log(response);
+              console.log(`${item.name} updated successfully!`);
             } else {
               console.log(err);
             }
           }
         );
       });
-      foundUser.save();
       // then create the order
       Order.create(
         {
@@ -607,6 +615,13 @@ app.post("/order/create/:userId", isUser, (req, res) => {
         },
         (err, result) => {
           if (!err) {
+            //then push the entire details of that user's order to the user's history
+            Order.find({ user: userId }).exec((err, foundOrders) => {
+              if (!err) {
+                foundUser.history = foundOrders;
+                foundUser.save();
+              }
+            });
             return res
               .status(201)
               .json({ message: "Order created successfully!" });
@@ -637,8 +652,20 @@ app.put("/order/:orderId", adminOnly, (req, res) => {
     }
   );
 });
+
+app.get("/order/history/:userId", isUser, (req, res) => {
+  const userId = req.params.userId;
+
+  Order.find({ user: userId }).exec((err, foundOrders) => {
+    if (!err) {
+      return res.json({ foundOrders });
+    } else {
+      return res.send(err);
+    }
+  });
+});
 ////////////////////////////////////////////////////////////////
 
-app.listen(4000, () => {
+app.listen(process.env.PORT || 4000, () => {
   console.log("listening on port 4000");
 });

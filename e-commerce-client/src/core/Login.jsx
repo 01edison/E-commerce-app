@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Layout from "./Layout";
 import { Url } from "../config";
+import { useCart } from "react-use-cart";
 import axios from "axios";
 import qs from "qs";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +15,7 @@ function Login() {
   const [error, setError] = useState(false);
   // const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { setItems } = useCart();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -46,8 +48,10 @@ function Login() {
           //if no errors
           setLoading(false);
           setError(false);
+          setItems(response.data.user.cart);
           // setSuccess(true);
-          authenticate(response.data)  // create user in the local storage
+          authenticate(response.data); // create user in the local storage
+
           navigate("/admin/dashboard");
         } else {
           setLoading(false);
@@ -57,7 +61,6 @@ function Login() {
         setUser((prevItems) => {
           return { ...prevItems, email: "", password: "" };
         });
-        
       })
       .catch((error) => {
         //handle any error
@@ -70,11 +73,7 @@ function Login() {
   const login = () => {
     return (
       <>
-        {error && (
-          <div className="alert alert-danger">
-            {error}
-          </div>
-        )}
+        {error && <div className="alert alert-danger">{error}</div>}
         {loading ? (
           <>
             <div className="alert alert-info">

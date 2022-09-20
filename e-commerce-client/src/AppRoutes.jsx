@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./core/Login";
 import Register from "./core/Register";
@@ -16,6 +16,7 @@ import AddProduct from "./core/admin/AddProduct";
 import Product from "./core/components/Product";
 
 function AppRoutes() {
+  const [checkOutTotal, setCheckOutTotal] = useState(0);
   return (
     <>
       <BrowserRouter>
@@ -70,12 +71,15 @@ function AppRoutes() {
               path="user/cart"
               element={
                 <ProtectedUserRoute>
-                  <Cart />
+                  <Cart
+                    checkOutTotal={checkOutTotal}
+                    setCheckOutTotal={setCheckOutTotal}
+                  />
                 </ProtectedUserRoute>
               }
             />
             <Route
-              path="profile"
+              path="profile/update"
               element={
                 <ProtectedUserRoute>
                   <Profile />

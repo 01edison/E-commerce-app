@@ -1,30 +1,15 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Url } from "../../config";
+import React from "react";
+import { useCart } from "react-use-cart";
 import { NavLink, useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../../helperMethods/functions";
 
 function Navbar() {
-  const [numCartItems, setNumCartItems] = useState(0);
-  const { user = "", token } = isAuthenticated(); // default value of user will be empty string unless the user is actually logged in 
-  useEffect(() => {
-    axios
-      .get(`${Url}/user/${user._id ? user._id : ""}`, {
-        headers: {
-          Authorization: token ? token : "",
-        },
-      })
-      .then((res) => {
-        setNumCartItems(res.data?.profile?.cart.length);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  });
+  const { totalUniqueItems } = useCart();
   const navigate = useNavigate();
   return (
     <>
-      <ul className="nav nav-tabs bg-primary">
+      <ul className="nav nav-tabs bg-primary">  
         <li className="nav-item">
           <NavLink
             className="nav-link"
@@ -58,9 +43,7 @@ function Navbar() {
             >
               My Cart{" "}
               <sup>
-                <small className="badge badge-danger badge-pill mb-2">
-                  {numCartItems}
-                </small>
+                <small className="badge badge-danger badge-pill mb-2">{totalUniqueItems}</small>
               </sup>
             </NavLink>
           </li>

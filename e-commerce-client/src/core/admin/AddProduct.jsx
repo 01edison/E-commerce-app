@@ -21,7 +21,6 @@ const AddProduct = () => {
       .catch((error) => console.log(error));
   }, []);
 
-  console.log(categories);
   const [product, setProduct] = useState({
     name: "",
     description: "",

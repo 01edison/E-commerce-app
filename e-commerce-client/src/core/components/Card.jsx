@@ -2,10 +2,11 @@ import moment from "moment";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Image from "./Image";
+import { useCart } from "react-use-cart";
 import {
   isAuthenticated,
   showStock,
-  addToCart,
+  addToCartInDB,
   deleteFromCart,
 } from "../../helperMethods/functions";
 
@@ -21,35 +22,27 @@ const Card = ({
   showDeleteFromCartButton = true,
   createdAt,
   cartUpdate = false,
-  setCheckOutTotal,
   setQuantityAlert,
 }) => {
   const [error, setError] = useState(false);
+  const [product, setProduct] = useState({
+    id,
+    name,
+    description,
+    price,
+    category,
+    quantity,
+    createdAt,
+  });
+  const { updateItemQuantity, addItem, items, removeItem } = useCart();
   const handleChange = (e) => {
     setQuantityAlert(false);
     setError(false);
-    if (isAuthenticated != false) {
-      const { name, value } = e.target;
-      if (value > quantity) {
-        return setError(true);
-      }
-      const cartInLocalStorage = JSON.parse(localStorage.getItem("cart")); // we get the cart from the localStorage
-      const productInCart = cartInLocalStorage.find(
-        (product) => product.name == name
-      ); //find that particular product in the cart
 
-      productInCart.cartCount =
-        value === "" || value === "0" ? 1 : Number(value); //update its count
-
-      localStorage.setItem("cart", JSON.stringify(cartInLocalStorage)); // then we resave the cart in the local storage so changes dont get cleared
-      const updatedCart = JSON.parse(localStorage.getItem("cart"));
-
-      const checkoutTotal = updatedCart.reduce((current, next) => {
-        // this is where the checkout total is being computed
-        return current + next.cartCount * Number(next.price);
-      }, 0);
-      localStorage.setItem("checkoutTotal", checkoutTotal); // create a new variable in the localstorage and store the checkout total there
-      setCheckOutTotal(localStorage.getItem("checkoutTotal")); // set the state in the cart component to that checkout total in the local storage
+    if (isAuthenticated() != false) {
+      console.log(e.target.value);
+      updateItemQuantity(id, e.target.value);
+      console.log(items)
     }
   };
 
@@ -100,7 +93,7 @@ const Card = ({
             {showViewProductButton && (
               <Link
                 to={`/product/${id}`}
-                className="btn btn-outline-primary mr-2"
+                className="btn btn-outline-primary mr-2 mb-2"
               >
                 View Product
               </Link>
@@ -108,7 +101,8 @@ const Card = ({
             {showAddToCartButton && quantity > 0 && (
               <button
                 onClick={() => {
-                  addToCart(id);
+                  addToCartInDB(id);
+                  addItem(product);
                 }}
                 className="btn btn-outline-success"
               >
@@ -120,6 +114,7 @@ const Card = ({
                 className="btn btn-danger"
                 onClick={() => {
                   deleteFromCart(id);
+                  removeItem(id);
                 }}
               >
                 Remove Product

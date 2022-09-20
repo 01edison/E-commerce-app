@@ -17,18 +17,19 @@ const Product = () => {
       .then((response) => {
         console.log(response.data);
         setProduct(response.data.product);
-
-        axios
-          .get(`${Url}/products/related/${productId}`)
-          .then((response) => {
-            console.log(response.data);
-            setRelatedProducts(response.data.products);
-          })
-          .catch((error) => console.log(error));
       })
       .catch((error) => console.log(error));
   }, [productId]);
 
+  useEffect(() => {
+    axios
+      .get(`${Url}/products/related/${productId}`)
+      .then((response) => {
+        console.log(response.data);
+        setRelatedProducts(response.data.products);
+      })
+      .catch((error) => console.log(error));
+  });
   return (
     <>
       <Layout

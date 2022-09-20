@@ -4,7 +4,7 @@ import Image from "./Image";
 import { Link } from "react-router-dom";
 import {
   showStock,
-  addToCart,
+  addToCartInDB,
   deleteFromCart,
 } from "../../helperMethods/functions";
 
@@ -47,7 +47,7 @@ const RelatedCard = ({
             {showAddToCartButton && quantity > 0 && (
               <button
                 onClick={() => {
-                  addToCart(id);
+                  addToCartInDB(id);
                 }}
                 className="btn btn-outline-success"
               >
