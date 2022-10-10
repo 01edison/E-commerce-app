@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema, model } = require("mongoose");
-
+require("dotenv").config();
 mongoose.connect(
-  "mongodb://localhost:27017/e-commerceDB",
+  `mongodb+srv://edison2000:${process.env.MONGO_URI_PASSWORD}@cluster0.pk7jdlr.mongodb.net/eCommerceDB`,
   {
     useNewUrlParser: true,
   },
@@ -77,10 +77,10 @@ const cartSchema = Schema({
     type: Number,
     required: true,
   },
-  dbQuantity:{
+  dbQuantity: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const userSchema = Schema(

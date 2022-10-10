@@ -22,8 +22,10 @@
 .product-image {
   /* max-height: 300px; */
   width: 150px;
-
 }
+
+
+.pointer {cursor: pointer;}
 @-webkit-keyframes Gradient {
   0% {
     background-position: 0% 50%;

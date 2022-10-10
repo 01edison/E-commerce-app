@@ -16,12 +16,17 @@ const AdminDashboard = () => {
             <ul className="list-group">
               <li className="list-group-item">
                 <Link className="nav-link" to="/category/create">
-                  Create Category
+                  Add Category
                 </Link>
               </li>
               <li className="list-group-item">
                 <Link className="nav-link" to="/product/create">
-                  Create Product
+                  Add Product
+                </Link>
+              </li>
+              <li className="list-group-item">
+                <Link className="nav-link" to="/products">
+                  Manage Products
                 </Link>
               </li>
               <li className="list-group-item">
@@ -52,12 +57,6 @@ const AdminDashboard = () => {
                 <li className="list-group-item">
                   {role === 0 ? "Registered User" : "Administrator"}
                 </li>
-              </ul>
-            </div>
-            <div className="card mb-3">
-              <h3 className="card-header">Purchase History</h3>
-              <ul className="list-group">
-                <li className="list-group-item">History: {}</li>
               </ul>
             </div>
           </div>

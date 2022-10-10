@@ -54,23 +54,29 @@ const Product = () => {
           </div>
 
           <div className="col-md-4">
-            <h4>Related Products</h4>
-            {relatedProducts.map((prod, i) => {
-              return (
-                <RelatedCard
-                  key={prod._id}
-                  id={prod._id}
-                  name={prod.name}
-                  description={prod.description}
-                  price={prod.price}
-                  category={prod.category?.name}
-                  createdAt={prod.createdAt}
-                  quantity={prod.quantity}
-                  showViewProductButton={true}
-                  showDeleteFromCartButton={false}
-                />
-              );
-            })}
+            {relatedProducts.length > 0 ? (
+              <>
+                <h4>Related Products</h4>
+                {relatedProducts.map((prod, i) => {
+                  return (
+                    <RelatedCard
+                      key={prod._id}
+                      id={prod._id}
+                      name={prod.name}
+                      description={prod.description}
+                      price={prod.price}
+                      category={prod.category?.name}
+                      createdAt={prod.createdAt}
+                      quantity={prod.quantity}
+                      showViewProductButton={true}
+                      showDeleteFromCartButton={false}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <h4>No related Products</h4>
+            )}
           </div>
         </div>
       </Layout>

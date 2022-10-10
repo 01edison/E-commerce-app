@@ -22,7 +22,6 @@ const Card = ({
   showDeleteFromCartButton = true,
   createdAt,
   cartUpdate = false,
-  setQuantityAlert,
 }) => {
   const [error, setError] = useState(false);
   const [product, setProduct] = useState({
@@ -36,13 +35,12 @@ const Card = ({
   });
   const { updateItemQuantity, addItem, items, removeItem } = useCart();
   const handleChange = (e) => {
-    setQuantityAlert(false);
     setError(false);
 
     if (isAuthenticated() != false) {
       console.log(e.target.value);
       updateItemQuantity(id, e.target.value);
-      console.log(items)
+      console.log(items);
     }
   };
 
@@ -63,9 +61,10 @@ const Card = ({
         <div className="card-header">
           {name} {showErrorMsg()}
         </div>
-        <div className="card-body d-flex">
+        <div className="card-body d-md-flex">
           <div>
             <Image id={id} className={"product-image"} />
+
             {cartUpdate && (
               <div className="input-group mt-3">
                 <div className="input-group-prepend">
@@ -85,41 +84,45 @@ const Card = ({
           </div>
           <div className="ml-2">
             {showStock(quantity)}
-            <p className="lead mt-2">{description}</p>
+            <p className="lead ">{description}</p>
             <p className="black-9">₦{price}</p>
-            <p>{category ? `Category: ${category}` : ""}</p>
-            <p>Added {moment(createdAt).fromNow()}</p>
+            <div className="d-none d-md-block">
+              <p>{category ? `Category: ${category}` : ""}</p>
+              <p>Added {moment(createdAt).fromNow()}</p>
+            </div>
 
-            {showViewProductButton && (
-              <Link
-                to={`/product/${id}`}
-                className="btn btn-outline-primary mr-2 mb-2"
-              >
-                View Product
-              </Link>
-            )}
-            {showAddToCartButton && quantity > 0 && (
-              <button
-                onClick={() => {
-                  addToCartInDB(id);
-                  addItem(product);
-                }}
-                className="btn btn-outline-success"
-              >
-                Add to Cart
-              </button>
-            )}
-            {showDeleteFromCartButton && (
-              <button
-                className="btn btn-danger"
-                onClick={() => {
-                  deleteFromCart(id);
-                  removeItem(id);
-                }}
-              >
-                Remove Product
-              </button>
-            )}
+            <span className="">
+              {showViewProductButton && (
+                <Link
+                  to={`/product/${id}`}
+                  className="btn btn-outline-primary mr-2"
+                >
+                  View Product
+                </Link>
+              )}
+              {showAddToCartButton && quantity > 0 && (
+                <button
+                  onClick={() => {
+                    addToCartInDB(id);
+                    addItem(product);
+                  }}
+                  className="btn btn-outline-success"
+                >
+                  Add to Cart
+                </button>
+              )}
+              {showDeleteFromCartButton && (
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    deleteFromCart(id);
+                    removeItem(id);
+                  }}
+                >
+                  Remove Product
+                </button>
+              )}
+            </span>
           </div>
         </div>
       </div>

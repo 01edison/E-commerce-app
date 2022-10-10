@@ -48,7 +48,7 @@ function Login() {
           //if no errors
           setLoading(false);
           setError(false);
-          setItems(response.data.user.cart);
+          setItems(response.data.user.cart);//update the cart state with the user's cart
           // setSuccess(true);
           authenticate(response.data); // create user in the local storage
 

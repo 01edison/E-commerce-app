@@ -14,7 +14,6 @@ const Cart = ({ setCheckOutTotal }) => {
   const [quantityAlert, setQuantityAlert] = useState(false);
 
   const { token, user = "" } = isAuthenticated(); //incase you're not logged in
-  console.log(items);
   const getCartItems = () => {
     axios
       .get(`${Url}/user/${user._id ? user._id : ""}`, {
@@ -24,7 +23,6 @@ const Cart = ({ setCheckOutTotal }) => {
       })
       .then((response) => {
         setItems(response.data.profile.cart);
-        console.log(items);
       })
       .catch((error) => {
         console.log(error);
@@ -47,8 +45,10 @@ const Cart = ({ setCheckOutTotal }) => {
         <button
           className="btn btn-danger"
           onClick={() => {
-            emptyCart();
-            clearCart();
+            if (window.confirm("Are you sure?")) {
+              emptyCart();
+              clearCart(user._id, token);
+            }
           }}
         >
           Empty Cart!
@@ -59,11 +59,10 @@ const Cart = ({ setCheckOutTotal }) => {
   const showCartItems = () => {
     return (
       <>
-        {emptyCartItems()}
-        <h2>
+        
+        <h2 className="text-center mb-2">
           Your cart has {items.length} {items.length > 1 ? "items" : "item"}
         </h2>
-
         <div className="d-flex flex-wrap">
           {items.map((product, i) => {
             return (
@@ -87,6 +86,7 @@ const Cart = ({ setCheckOutTotal }) => {
             );
           })}
         </div>
+        {emptyCartItems()}
       </>
     );
   };
@@ -97,18 +97,15 @@ const Cart = ({ setCheckOutTotal }) => {
         description={`Check out items in your cart, ${user?.name}!`}
         className="container-fluid"
       >
-        <div className="row">
-          <div className="col-6">
-            {items.length > 0 ? showCartItems() : noItemsMessage()}
-          </div>
-          <div className="col-6">
+        <div className="d-md-flex row">
+          <div className="col-sm-6">
             <h2>Your Cart summary</h2>
-
             <Checkout
-              cart={items}
-              setQuantityAlert={setQuantityAlert}
-              quantityAlert={quantityAlert}
+              cart={items}              
             />
+          </div>
+          <div className="">
+            {items.length > 0 ? showCartItems() : noItemsMessage()}
           </div>
         </div>
       </Layout>

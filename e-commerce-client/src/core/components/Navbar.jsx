@@ -9,7 +9,7 @@ function Navbar() {
   const navigate = useNavigate();
   return (
     <>
-      <ul className="nav nav-tabs bg-primary">  
+      <ul className="nav nav-tabs bg-primary">
         <li className="nav-item">
           <NavLink
             className="nav-link"
@@ -32,7 +32,7 @@ function Navbar() {
             Shop
           </NavLink>
         </li>
-        {isAuthenticated() && (
+        {isAuthenticated() && isAuthenticated().user.role != 1 && (
           <li className="nav-item">
             <NavLink
               className="nav-link"
@@ -43,7 +43,9 @@ function Navbar() {
             >
               My Cart{" "}
               <sup>
-                <small className="badge badge-danger badge-pill mb-2">{totalUniqueItems}</small>
+                <small className="badge badge-danger badge-pill mb-2">
+                  {totalUniqueItems}
+                </small>
               </sup>
             </NavLink>
           </li>

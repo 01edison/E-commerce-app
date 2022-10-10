@@ -12,11 +12,12 @@ import ProtectedAdminDashboard from "./core/admin/ProtectedAdminDashboard";
 import ProtectedAdminRoute from "./core/admin/ProtectedAdminRoute";
 import Orders from "./core/admin/Orders";
 import AddCategory from "./core/admin/AddCategory";
+import ManageProducts from "./core/admin/ManageProducts";
+import UpdateProduct from "./core/admin/UpdateProduct";
 import AddProduct from "./core/admin/AddProduct";
 import Product from "./core/components/Product";
 
 function AppRoutes() {
-  const [checkOutTotal, setCheckOutTotal] = useState(0);
   return (
     <>
       <BrowserRouter>
@@ -71,11 +72,24 @@ function AppRoutes() {
               path="user/cart"
               element={
                 <ProtectedUserRoute>
-                  <Cart
-                    checkOutTotal={checkOutTotal}
-                    setCheckOutTotal={setCheckOutTotal}
-                  />
+                  <Cart />
                 </ProtectedUserRoute>
+              }
+            />
+            <Route
+              path="products"
+              element={
+                <ProtectedAdminRoute>
+                  <ManageProducts />
+                </ProtectedAdminRoute>
+              }
+            />
+            <Route
+              path="product/update/:productId"
+              element={
+                <ProtectedAdminRoute>
+                  <UpdateProduct />
+                </ProtectedAdminRoute>
               }
             />
             <Route

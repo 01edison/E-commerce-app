@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../Layout";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { isAuthenticated } from "../../helperMethods/functions";
 import { Url } from "../../config";
 
-const AddProduct = () => {
+const UpdateProduct = () => {
   const {
     user: { name },
     token,
   } = isAuthenticated();
-
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(`${Url}/categories`)
-      .then((response) => {
-        setCategories(response.data.categories);
-      })
-      .catch((error) => console.log(error));
-  }, []);
-
   const [product, setProduct] = useState({
     name: "",
     description: "",
@@ -35,7 +26,40 @@ const AddProduct = () => {
   const [success, setSuccess] = useState(false);
   const [notUnique, setNotUnique] = useState(false);
   const [photo, setPhoto] = useState("");
+  const { productId } = useParams();
 
+  const getSingleProduct = (productId) => {
+    axios
+      .get(`${Url}/product/${productId}`)
+      .then((response) => {
+        const { product } = response.data;
+        console.log(product);
+        setProduct((prevProduct) => {
+          return {
+            ...prevProduct,
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            quantity: product.quantity,
+            price: product.price,
+            shipping: product.shipping,
+          };
+        });
+      })
+      .catch((e) => console.log(e));
+  };
+
+  useEffect(() => {
+    getSingleProduct(productId);
+  }, []);
+  useEffect(() => {
+    axios
+      .get(`${Url}/categories`)
+      .then((response) => {
+        setCategories(response.data.categories);
+      })
+      .catch((error) => console.log(error));
+  }, []);
   const {
     name: productName,
     description,
@@ -57,27 +81,29 @@ const AddProduct = () => {
       setPhoto(event.target.files[0]);
     } else {
       const { name, value } = event.target;
+      console.log(name, value);
       setProduct({ ...product, [name]: value });
     }
   };
 
   const handleSubmit = () => {
     setError(false);
-
     formData.append("name", productName); //append the values with key, value pair
     formData.append("description", description);
     formData.append("quantity", quantity);
     formData.append("shipping", shipping);
-    formData.append("category", category);
+    formData.append("category", category._id);
     formData.append("price", price);
-    formData.append("photo", photo);
+    if (photo) {
+      formData.append("photo", photo);
+    }
 
     const config = {
       headers: { "content-type": "multipart/form-data", Authorization: token },
     };
 
     axios
-      .post(`${Url}/product/create`, formData, config)
+      .patch(`${Url}/product/${productId}`, formData, config)
       .then((response) => {
         console.log(response);
         if (!response.data.error) {
@@ -92,6 +118,9 @@ const AddProduct = () => {
             price: "",
             shipping: "",
           });
+          setTimeout(() => {
+            navigate("/");
+          }, 2500);
         } else if (
           response.data.error.includes("Error uploading image: E11000")
         ) {
@@ -115,7 +144,7 @@ const AddProduct = () => {
   };
   const showSuccess = () => {
     if (success) {
-      return <h3 className="text-success">Product added successfully!</h3>;
+      return <h3 className="text-success">Product updated successfully!</h3>;
     }
   };
   const showError = () => {
@@ -123,21 +152,15 @@ const AddProduct = () => {
       return <h3 className="text-danger">{errorMsg}</h3>;
     }
   };
-  const showNotUnique = () => {
-    if (notUnique) {
-      return <h3 className="text-danger">Product already exists</h3>;
-    }
-  };
   return (
     <>
       <Layout
-        title="Add a product!"
-        description={`Good day, ${name}. Ready to add some new products?`}
+        title="Update product!"
+        description={`Good day, ${name}. Update ${product.name}`}
       />
       <div className="col-md-8 offset-md-2">
         {showSuccess()}
         {showError()}
-        {showNotUnique()}
         <form>
           <h4>Post photo</h4>
           <div className="form-group">
@@ -147,7 +170,7 @@ const AddProduct = () => {
                 name="photo"
                 id="productPhoto"
                 onChange={handleInputChange}
-                key={fileKey} 
+                key={fileKey}
               />
             </label>
           </div>
@@ -158,7 +181,6 @@ const AddProduct = () => {
               className="form-control"
               id="productName"
               name="name"
-              required
               onChange={handleInputChange}
               value={product.name}
             />
@@ -170,7 +192,6 @@ const AddProduct = () => {
               className="form-control"
               id="productDescription"
               name="description"
-              required
               onChange={handleInputChange}
               value={product.description}
             />
@@ -183,7 +204,6 @@ const AddProduct = () => {
               id="productPrice"
               name="price"
               min={0}
-              required
               onChange={handleInputChange}
               value={product.price}
             />
@@ -194,7 +214,7 @@ const AddProduct = () => {
               name="category"
               className="form-control"
               onChange={handleInputChange}
-              value={product.category}
+              value={product.category._id}
             >
               <option>Please select</option>
               {categories.map((category, i) => {
@@ -214,7 +234,6 @@ const AddProduct = () => {
               id="productQuantity"
               name="quantity"
               min={0}
-              required
               onChange={handleInputChange}
               value={product.quantity}
             />
@@ -236,12 +255,12 @@ const AddProduct = () => {
             type="submit"
             className="btn btn-primary"
             onClick={(e) => {
-              e.preventDefault()
+              e.preventDefault();
               handleSubmit();
               functionThatResetsTheFileInput();
             }}
           >
-            Add
+            Update
           </button>
         </form>
       </div>
@@ -249,4 +268,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default UpdateProduct;

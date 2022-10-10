@@ -5,6 +5,7 @@ const formidable = require("formidable");
 const _ = require("lodash");
 const fs = require("fs");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const { sign } = require("jsonwebtoken");
@@ -154,8 +155,8 @@ app.post("/user/cart/:productId", requireSignIn, (req, res) => {
           name: foundProduct.name,
           description: foundProduct.description,
           price: foundProduct.price,
-          dbQuantity: foundProduct.quantity
-        }
+          dbQuantity: foundProduct.quantity,
+        };
         User.findById(userId).exec((err, foundUser) => {
           if (!err) {
             const alreadyInCart = foundUser.cart.some(
@@ -299,7 +300,7 @@ app.get("/product/:productId", (req, res) => {
       if (err || !foundProduct) {
         return res.status(400).json({ error: "Product not found." });
       }
-      foundProduct.photo = undefined;
+      // foundProduct.photo = undefined;
       return res.json({ product: foundProduct });
     });
 });
@@ -439,27 +440,12 @@ app.patch("/product/:productId", adminOnly, (req, res) => {
       return res.status(400).json({ message: err });
     }
 
-    const { name, price, category, shipping, quantity, description } = fields;
-
-    if (
-      !name ||
-      !price ||
-      !category ||
-      !shipping ||
-      !quantity ||
-      !description
-    ) {
-      return res.json({
-        error: "Missing fields. Please fill all required fields.",
-      });
-    }
-
     Product.findById(productId).exec(function (err, foundProduct) {
       if (err) {
         return res.json({ error: "Error updating product" });
       }
 
-      const updatedProduct = _.extend(foundProduct, fields); // extends the values of fields into the foundProduct object
+      const updatedProduct = _.extend(foundProduct, fields); // updates the properties of the found product with the fields object
 
       if (files.photo) {
         if (files.photo.size > 1000000) {
@@ -565,7 +551,7 @@ app.get("/order/list", adminOnly, (req, res) => {
   Order.find()
     .populate("user", "_id name email address")
     .sort({
-      createdAt: "desc",
+      createdAt: "asc",
     })
     .exec((err, foundOrders) => {
       if (!err) {

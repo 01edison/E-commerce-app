@@ -14,26 +14,10 @@ const UserDashboard = () => {
     name: "",
     email: "",
     role: "",
+    history: []
   });
-  const history = useRef();
-  const { name, email, role } = userInfo;
-  const getPurchaseHistory = () => {
-    const { token, user } = isAuthenticated();
-
-    axios
-      .get(`${Url}/order/history/${user._id}`, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        history.current = response.data.foundOrders;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
+ 
+  const { name, email, role, history } = userInfo;
 
   const userLinks = () => {
     return (
@@ -61,11 +45,8 @@ const UserDashboard = () => {
 
   useEffect(() => {
     getUserInfo(userInfo, setUserInfo);
-  }, [history]);
+  }, []);
 
-  useEffect(() => {
-    getPurchaseHistory();
-  });
   return (
     <>
       <Layout
@@ -85,7 +66,7 @@ const UserDashboard = () => {
                 </li>
               </ul>
             </div>
-            {}
+            {purchaseHistory(history)};
           </div>
           {userLinks()}
         </div>

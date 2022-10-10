@@ -1,6 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 import { Url } from "../config.js";
+import moment from "moment";
 
 export const isAuthenticated = () => {
   if (typeof window == "undefined") {
@@ -21,9 +22,9 @@ export const authenticate = (data) => {
 
 export const showStock = (quantity) => {
   return quantity > 0 ? (
-    <span className="badge badge-primary badge-pill mb-2">In Stock</span>
+    <span className="badge badge-primary badge-pill mb-1">In Stock</span>
   ) : (
-    <span className="badge badge-danger badge-pill mb-2">Out of Stock</span>
+    <span className="badge badge-danger badge-pill mb-1">Out of Stock</span>
   );
 };
 
@@ -50,7 +51,7 @@ export const deleteFromCart = async (id) => {
     const productId = id;
 
     try {
-      const res = await axios({
+      await axios({
         url: `${Url}/user/cart/${productId}`,
         method: "DELETE",
         headers: {
@@ -94,7 +95,7 @@ export const createOrder = async (id, token, data) => {
 };
 
 export const getUserInfo = async (userInfo, setUserInfo) => {
-  if (isAuthenticated() != false) {
+  if (isAuthenticated() !== false) {
     const { token, user } = isAuthenticated();
     try {
       const res = await axios.get(`${Url}/user/${user._id}`, {
@@ -112,33 +113,49 @@ export const getUserInfo = async (userInfo, setUserInfo) => {
 };
 
 export const purchaseHistory = (history) => {
-  console.log(history)
+  console.log(history);
 
-  // return (
-  //   <>
-  //     <div className="card mb-5">
-  //       <h3 className="card-header">Purchase history</h3>
-  //       <ul className="list-group">
-  //         <li className="list-group-item">
-  //           {history.map((h, i) => {
-  //             return (
-  //               <div key={i}>
-  //                 <hr />
-  //                 {h.products.map((p, i) => {
-  //                   return (
-  //                     <div key={i}>
-  //                       <h6>Product name: {p.name}</h6>
-  //                       <h6>Product price: ${p.price}</h6>
-  //                     </div>
-  //                   );
-  //                 })}
-  //                 <h6>Purchased date: {moment(h.createdAt).fromNow()}</h6>
-  //               </div>
-  //             );
-  //           })}
-  //         </li>
-  //       </ul>
-  //     </div>
-  //   </>
-  // );
+  return (
+    <>
+      <div className="card mb-5">
+        <h3 className="card-header">Purchase history</h3>
+        <ul className="list-group">
+          <li className="list-group-item">
+            {history.map((h, i) => {
+              return (
+                <div key={i}>
+                  <hr />
+                  {h.products.map((p, i) => {
+                    return (
+                      <div key={i} className="text-center">
+                        <h6>Product name: {p.name}</h6>
+                        <h6>Product price: ₦{p.price}</h6>
+                        <h6>Product Quantity: {p.quantity}</h6>
+                        <hr width="90"/>
+                      </div>
+                    );
+                  })}
+                  <h6>Purchased date: {moment(h.createdAt).fromNow()}</h6>
+                </div>
+              );
+            })}
+          </li>
+        </ul>
+      </div>
+    </>
+  );
 };
+
+export const deleteProduct = (token, productId) => {
+  if (isAuthenticated() !== false) {
+    axios
+      .delete(`${Url}/product/${productId}`, {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((response) => console.log(response))
+      .catch((e) => console.log(e));
+  }
+};
+

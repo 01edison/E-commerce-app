@@ -7,13 +7,10 @@ import {
 } from "../helperMethods/functions";
 import { usePaystackPayment } from "react-paystack";
 
-export default function Checkout({
-  cart,
-  quantityAlert,
-  setQuantityAlert,
-}) {
+export default function Checkout() {
   const [success, setSuccess] = useState(false);
   const [address, setAddress] = useState("");
+  const [isAddress, setIsAddress] = useState(true);
   const { emptyCart, cartTotal, items } = useCart();
 
   const { user, token } = isAuthenticated();
@@ -25,15 +22,18 @@ export default function Checkout({
   };
 
   const handleAddress = (e) => {
+    setIsAddress(false);
     setAddress(e.target.value);
+    if (e.target.value == "") {
+      setIsAddress(true);
+    }
   };
 
   const onSuccess = (reference) => {
     setSuccess(true);
     // Implementation for whatever you want to do with reference and after success call.
-    console.log(reference);
+    setAddress("");
 
-    //USE THE CART STATE FROM THE react-use-cart package
     const body = {
       order: [],
       amount: `₦${cartTotal}`,
@@ -41,13 +41,13 @@ export default function Checkout({
       reference,
     };
     console.log(items);
-    items.forEach((item) => {
+    items.forEach((cartItem) => {
       const orderedItem = {
-        name: item.name,
-        price: item.price,
-        decription: item.description,
-        category: item.category,
-        quantity: item.quantity,
+        name: cartItem.name,
+        price: cartItem.price,
+        decription: cartItem.description,
+        category: cartItem.category,
+        quantity: cartItem.quantity,
       };
       body.order.push(orderedItem);
     });
@@ -78,39 +78,38 @@ export default function Checkout({
   };
 
   const showQuantityAlert = () => {
-    if (quantityAlert && cart.length > 0) {
+    if (isAddress) {
       return (
-        <span className="badge badge-danger">
-          Please adjust the quantity of products you want
-        </span>
+        <span className="badge badge-danger">Please Enter an address</span>
       );
     }
   };
-  useEffect(() => {
-    setQuantityAlert(true);
-  }, []);
   return (
     <>
-      {showSuccess()}
-      <textarea
-        className="mb-3"
-        cols={50}
-        placeholder="Enter your address.."
-        onChange={handleAddress}
-      />
-      <h2>
-        Total: ₦{cartTotal} <sup>{showQuantityAlert()}</sup>
-      </h2>
+      <div>
+        {showSuccess()}
+        <textarea
+          className="mb-3"
+          cols={50}
+          placeholder="Enter your address.."
+          onChange={handleAddress}
+          required
+          value={address}
+        />
+        <h2>
+          Total: ₦{cartTotal} <sup>{showQuantityAlert()}</sup>
+        </h2>
 
-      <button
-        className="btn btn-success btn-block"
-        onClick={() => {
-          initializePayment(onSuccess, onClose);
-          
-        }}
-      >
-        Checkout
-      </button>
+        <button
+          className="btn btn-success btn-block"
+          onClick={() => {
+            initializePayment(onSuccess, onClose);
+          }}
+          disabled={isAddress}
+        >
+          Checkout
+        </button>
+      </div>
     </>
   );
 }
