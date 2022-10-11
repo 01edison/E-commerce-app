@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import {
-  isAuthenticated,
-  deleteProduct,
-  getSingleProduct,
-} from "../../helperMethods/functions";
+import { isAuthenticated, deleteProduct } from "../../helperMethods/functions";
 import Layout from "../Layout";
 import { Link } from "react-router-dom";
 import axios from "axios";

@@ -15,6 +15,8 @@ function Home() {
       })
       .then((response) => {
         if (!response.data.error) {
+          console.log(response.data)
+          
           setProducts(response.data);
         }
       })

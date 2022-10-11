@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useCart } from "react-use-cart";
 import {
   isAuthenticated,
@@ -24,7 +24,7 @@ export default function Checkout() {
   const handleAddress = (e) => {
     setIsAddress(false);
     setAddress(e.target.value);
-    if (e.target.value == "") {
+    if (e.target.value === "") {
       setIsAddress(true);
     }
   };

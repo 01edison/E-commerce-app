@@ -23,6 +23,7 @@ const Card = ({
   createdAt,
   cartUpdate = false,
 }) => {
+  const { user } = isAuthenticated();
   const [error, setError] = useState(false);
   const [product, setProduct] = useState({
     id,
@@ -37,7 +38,7 @@ const Card = ({
   const handleChange = (e) => {
     setError(false);
 
-    if (isAuthenticated() != false) {
+    if (isAuthenticated() !== false) {
       console.log(e.target.value);
       updateItemQuantity(id, e.target.value);
       console.log(items);
@@ -100,7 +101,7 @@ const Card = ({
                   View Product
                 </Link>
               )}
-              {showAddToCartButton && quantity > 0 && (
+              {showAddToCartButton && quantity > 0 && user?.role === 0 && (
                 <button
                   onClick={() => {
                     addToCartInDB(id);

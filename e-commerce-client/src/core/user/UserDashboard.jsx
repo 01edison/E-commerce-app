@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../Layout";
 import {
-  isAuthenticated,
   purchaseHistory,
 } from "../../helperMethods/functions";
-import axios from "axios";
-import { Url } from "../../config";
 import { getUserInfo } from "../../helperMethods/functions";
 
 const UserDashboard = () => {
@@ -66,7 +63,7 @@ const UserDashboard = () => {
                 </li>
               </ul>
             </div>
-            {purchaseHistory(history)};
+            {purchaseHistory(history)}
           </div>
           {userLinks()}
         </div>

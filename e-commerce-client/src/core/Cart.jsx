@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import { useCart } from "react-use-cart";
 import { isAuthenticated, clearCart } from "../helperMethods/functions";
 import axios from "axios";
@@ -9,10 +9,7 @@ import Checkout from "./Checkout";
 import Layout from "./Layout";
 
 const Cart = ({ setCheckOutTotal }) => {
-  const { items, setItems, cartTotal, emptyCart } = useCart();
-
-  const [quantityAlert, setQuantityAlert] = useState(false);
-
+  const { items, setItems, emptyCart } = useCart();
   const { token, user = "" } = isAuthenticated(); //incase you're not logged in
   const getCartItems = () => {
     axios
@@ -80,7 +77,6 @@ const Cart = ({ setCheckOutTotal }) => {
                   showCheckoutButton={true}
                   cartUpdate={true}
                   setCheckOutTotal={setCheckOutTotal}
-                  setQuantityAlert={setQuantityAlert}
                 />
               </>
             );
@@ -104,7 +100,7 @@ const Cart = ({ setCheckOutTotal }) => {
               cart={items}              
             />
           </div>
-          <div className="">
+          <div>
             {items.length > 0 ? showCartItems() : noItemsMessage()}
           </div>
         </div>
