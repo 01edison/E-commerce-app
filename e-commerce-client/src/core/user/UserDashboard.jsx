@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../Layout";
-import {
-  purchaseHistory,
-} from "../../helperMethods/functions";
+import { purchaseHistory } from "../../helperMethods/functions";
 import { getUserInfo } from "../../helperMethods/functions";
 
 const UserDashboard = () => {
+  const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
     role: "",
-    history: []
+    history: [],
   });
- 
+
   const { name, email, role, history } = userInfo;
 
   const userLinks = () => {
@@ -41,7 +40,11 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    getUserInfo(userInfo, setUserInfo);
+    (async () => {
+      setLoading(true);
+      await getUserInfo(userInfo, setUserInfo);
+      setLoading(false);
+    })();
   }, []);
 
   return (
@@ -51,6 +54,7 @@ const UserDashboard = () => {
         description={`Good day, ${name}`}
         className="container"
       >
+        {loading && <p>Loading ...</p>}
         <div className="row">
           <div className="col-lg-9">
             <div className="card mb-5">

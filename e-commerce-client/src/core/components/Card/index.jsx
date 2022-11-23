@@ -1,14 +1,15 @@
 import moment from "moment";
+import "./card.css";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Image from "./Image";
+import Image from "../Image";
 import { useCart } from "react-use-cart";
 import {
   isAuthenticated,
   showStock,
   addToCartInDB,
   deleteFromCart,
-} from "../../helperMethods/functions";
+} from "../../../helperMethods/functions";
 
 const Card = ({
   id,
@@ -34,14 +35,16 @@ const Card = ({
     quantity,
     createdAt,
   });
-  const { updateItemQuantity, addItem, items, removeItem } = useCart();
+  const { updateItemQuantity, addItem, removeItem } = useCart();
   const handleChange = (e) => {
     setError(false);
-
     if (isAuthenticated() !== false) {
-      console.log(e.target.value);
-      updateItemQuantity(id, e.target.value);
-      console.log(items);
+      if (e.target.value > 0) {
+        updateItemQuantity(id, e.target.value);
+      }
+      if (e.target.value > quantity) {
+        setError(true);
+      }
     }
   };
 
@@ -58,9 +61,11 @@ const Card = ({
   };
   return (
     <>
-      <div className="card product-card mb-3 mx-3">
-        <div className="card-header">
-          {name} {showErrorMsg()}
+      <div className="product-card mb-3 mx-3">
+        <div className="card-header d-flex justify-content-between">
+          {name}
+          {showStock(quantity)}
+          {showErrorMsg()}
         </div>
         <div className="card-body d-md-flex">
           <div>
@@ -84,7 +89,6 @@ const Card = ({
             )}
           </div>
           <div className="ml-2">
-            {showStock(quantity)}
             <p className="lead ">{description}</p>
             <p className="black-9">₦{price}</p>
             <div className="d-none d-md-block">
@@ -107,14 +111,15 @@ const Card = ({
                     addToCartInDB(id);
                     addItem(product);
                   }}
-                  className="btn btn-outline-success"
+                  className="btn btn-outline-success mt-2 add-to-cart-btn"
                 >
                   Add to Cart
                 </button>
               )}
               {showDeleteFromCartButton && (
                 <button
-                  className="btn btn-danger"
+                style={{width: "8.5rem", marginRight:"1rem"}}
+                  className="btn btn-danger mt-2"
                   onClick={() => {
                     deleteFromCart(id);
                     removeItem(id);

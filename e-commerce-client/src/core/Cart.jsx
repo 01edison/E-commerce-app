@@ -8,7 +8,7 @@ import Card from "./components/Card";
 import Checkout from "./Checkout";
 import Layout from "./Layout";
 
-const Cart = ({ setCheckOutTotal }) => {
+const Cart = () => {
   const { items, setItems, emptyCart } = useCart();
   const { token, user = "" } = isAuthenticated(); //incase you're not logged in
   const getCartItems = () => {
@@ -62,23 +62,23 @@ const Cart = ({ setCheckOutTotal }) => {
         </h2>
         <div className="d-flex flex-wrap">
           {items.map((product, i) => {
+            // console.log(product.)
             return (
-              <>
+              <span>
                 <Card
                   key={i}
                   id={product.id}
                   name={product.name}
                   description={product.description}
                   price={product.price}
-                  quantity={product.dbQuantity}
+                  quantity={product.quantity}
                   createdAt={product.createdAt}
                   showAddToCartButton={false}
                   showDeleteFromCartButton={true}
                   showCheckoutButton={true}
                   cartUpdate={true}
-                  setCheckOutTotal={setCheckOutTotal}
                 />
-              </>
+              </span>
             );
           })}
         </div>

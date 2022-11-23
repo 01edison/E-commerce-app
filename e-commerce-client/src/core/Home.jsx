@@ -2,27 +2,31 @@ import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
 import Card from "./components/Card";
 import { Url } from "../config";
+import LoadingSpinner from "./components/LoadingSpinner";
 import axios from "axios";
 function Home() {
   const [products, setProducts] = useState([]);
+  const [fetching, setFetching] = useState(false);
+
   useEffect(() => {
-    axios
-      .get(`${Url}/products`, {
-        params: {
-          arrival: "desc",
-          limit: 4,
-        },
-      })
-      .then((response) => {
-        if (!response.data.error) {
-          console.log(response.data)
-          
-          setProducts(response.data);
+    
+    setFetching(true);
+    (async () => {
+      try {
+        const res = await axios.get(`${Url}/products`, {
+          params: {
+            arrival: "desc",
+            limit: 4,
+          },
+        });
+        if (!res.data.error) {
+          setProducts(res.data);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log(error);
-      });
+      }
+      setFetching(false);
+    })();
   }, []);
   return (
     <>
@@ -32,7 +36,8 @@ function Home() {
         className="container-fluid"
       >
         <h1>Newest arrivals!</h1>
-        <div className="d-flex flex-wrap">
+        <div className={`${fetching ? "" : "d-flex flex-wrap"}`}>
+          {fetching && <LoadingSpinner />}
           {products.map((product, i) => {
             return (
               <Card
