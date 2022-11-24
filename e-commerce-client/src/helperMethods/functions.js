@@ -1,6 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 import { Url } from "../config.js";
+
 import moment from "moment";
 
 export const isAuthenticated = () => {
@@ -38,7 +39,6 @@ export const addToCartInDB = async (id) => {
           Authorization: token,
         },
       });
-      alert(res.data.message || res.data.error);
     } catch (error) {
       console.log(error);
     }

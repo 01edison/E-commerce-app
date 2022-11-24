@@ -29,7 +29,7 @@ exports.requireSignIn = (req, res, next) => {
 };
 
 exports.isAuthenticatedUser = function (req, res, next) {
-  let isUser = req.profile._id == req.params.userId;
+  let isUser = req.profile?._id == req.params?.userId;
   if (isUser) {
     next();
   } else {

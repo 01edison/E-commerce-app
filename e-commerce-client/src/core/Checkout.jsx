@@ -51,7 +51,6 @@ export default function Checkout() {
       };
       body.order.push(orderedItem);
     });
-    // console.log(body);
     clearCart(user._id, token);
     createOrder(user._id, token, body);
     emptyCart();
