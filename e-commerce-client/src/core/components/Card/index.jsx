@@ -1,8 +1,9 @@
 import moment from "moment";
 import "./card.css";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/fontawesome-free";
+import axios from "axios";
+import { Url } from "../../../config";
+import { useNavigate } from "react-router-dom";
 import Image from "../Image";
 import { useCart } from "react-use-cart";
 import {
@@ -25,6 +26,8 @@ const Card = ({
 }) => {
   const { user } = isAuthenticated();
   const [error, setError] = useState(false);
+  const [dbQuantity, setDbQuantity] = useState(0);
+  const [cartQuantity, setCartQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const [cartUpdate, setCartUpdate] = useState(false);
   const navigate = useNavigate();
@@ -37,18 +40,22 @@ const Card = ({
     quantity,
     createdAt,
   });
-  const { updateItemQuantity, addItem, removeItem, inCart } = useCart();
+  const { updateItemQuantity, addItem, removeItem, inCart, onItemAdd } =
+    useCart();
 
   const handleChange = (e) => {
     setError(false);
     if (isAuthenticated() !== false) {
-      if (e.target.value > 0) {
-        updateItemQuantity(id, e.target.value);
-        setCartUpdate(!cartUpdate); // just to cause a re-render ;)
-      }
-      if (e.target.value > quantity) {
-        setError(true);
-      }
+      console.log(e.target);
+    }
+  };
+
+  const getDBQuantity = async () => {
+    try {
+      const res = await axios.get(`${Url}/product/${id}`);
+      setDbQuantity(res.data?.product.quantity);
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -58,16 +65,8 @@ const Card = ({
         setAddedToCart(true);
       }
     }
+    getDBQuantity();
   }, []);
-  const showErrorMsg = () => {
-    if (error) {
-      return (
-        <>
-          <span className="badge badge-danger">We don't have the many :(</span>
-        </>
-      );
-    }
-  };
   return (
     <>
       <div className="card-component">
@@ -80,7 +79,7 @@ const Card = ({
             navigate(`/product/${id}`);
           }}
         >
-          <i class="fa-solid fa-circle-info"></i>
+          <i className="fa-solid fa-circle-info"></i>
         </span>
         <span className="stock-icon">{showStock(quantity)}</span>
         <div className="product-img-container">
@@ -111,7 +110,7 @@ const Card = ({
             {addedToCart ? (
               <>
                 <span>ADDED TO CART</span>
-                <i class="fa-regular fa-circle-check"></i>
+                <i className="fa-regular fa-circle-check"></i>
               </>
             ) : (
               "ADD TO CART"
@@ -128,14 +127,29 @@ const Card = ({
             >
               Remove from cart
             </button>
-            <input
-              onChange={handleChange}
-              type="number"
-              placeholder="Quantity"
-              name={name}
-              min="1"
-              max={quantity}
-            />
+            <div className="">
+              <button className="cart-btn btn btn-warning decrement-btn mr-3 rounded"
+                onClick={() => {
+                  if (cartQuantity > 1) {
+                    setCartQuantity(cartQuantity - 1);
+                    updateItemQuantity(id, cartQuantity - 1);
+                  }
+                }}
+              >
+                -
+              </button>
+              <span>{cartQuantity}</span>
+              <button className="cart-btn btn btn-success increment-btn ml-3 rounded"
+                onClick={() => {
+                  if (cartQuantity < dbQuantity) {
+                    setCartQuantity(cartQuantity + 1);
+                    updateItemQuantity(id, cartQuantity + 1);
+                  }
+                }}
+              >
+                +
+              </button>
+            </div>
           </div>
         )}
       </div>

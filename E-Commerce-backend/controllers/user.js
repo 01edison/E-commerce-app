@@ -87,8 +87,8 @@ const getUser = (req, res) => {
 };
 
 const addToCart = (req, res) => {
-  const userId = req.profile._id;
-  const productId = req.params.productId;
+  const userId = req.profile?._id;
+  const productId = req.params?.productId;
   Product.findById(productId)
     .select("-photo")
     .exec((err, foundProduct) => {
@@ -125,8 +125,8 @@ const addToCart = (req, res) => {
 };
 
 const deleteItemFromCart = (req, res) => {
-  const userId = req.profile._id;
-  const productId = req.params.productId;
+  const userId = req.profile?._id; 
+  const productId = req.params?.productId;
 
   Product.findById(productId).exec((err, foundProduct) => {
     if (!err) {
